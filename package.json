@@ -11,6 +11,9 @@
   "dependencies": {
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.7",
+    "antd": "^5.20.6",
+    "antd-style": "^3.6.3",
+    "axios": "^1.7.7",
     "three": "^0.168.0",
     "umi": "^4.3.20"
   },

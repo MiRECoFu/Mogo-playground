@@ -10,7 +10,7 @@ const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run
 // import '../../../mock/singlefoot-stand.bvh'
 // const bvh = require('../../../mock/singlefoot-stand.bvh')
 
-const BVHAnimation = () => {
+const BVHAnimation = ({ url }: {url: string}) => {
   const skeletonRef = useRef();
   const [skeletonHelper, setSkeletonHelper] = useState(null);
   const [mixer, setMixer] = useState(null);
@@ -19,7 +19,7 @@ const BVHAnimation = () => {
 
   React.useEffect(() => {
     const loader = new BVHLoader();
-    loader.load(bvh,  (result) => {
+    loader.load(url,  (result) => {
       const { skeleton, clip } = result;
 
       // Create a SkeletonHelper to visualize the skeleton
@@ -60,7 +60,7 @@ const BVHAnimation = () => {
         mixer.stopAllAction();
       }
     };
-  }, []);
+  }, [url]);
 
   useFrame((state, delta) => {
     // console.log(delta, 'delta')
