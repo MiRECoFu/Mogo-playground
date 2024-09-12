@@ -58,6 +58,8 @@ const BVHAnimation = ({ url }: {url: string}) => {
     return () => {
       if (mixer) {
         mixer.stopAllAction();
+        setSk(null)
+        setSkeletonHelper(null)
       }
     };
   }, [url]);

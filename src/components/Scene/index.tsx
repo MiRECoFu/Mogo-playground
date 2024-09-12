@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import BVHAnimation from "../BVHAnimation";
-import { Button, Input, InputNumber, ConfigProvider, Space } from "antd";
+import { Button, Input, InputNumber, ConfigProvider, Space, message } from "antd";
 // import { Button, ConfigProvider, Space } from 'antd';
 import { createStyles } from 'antd-style';
 import styles from './style.less';
@@ -41,15 +41,21 @@ const Scene = () => {
     const [motionUrl, setMotionUrl] = useState<string>()
     const genMotions = async () => {
       setDisabled(true)
-      const response = await axios.post('https://u213403-ac50-f8fb3f5b.westc.gpuhub.com:8443/generate_motion', {
-        prompt,
-        length
-    }, {
-      timeout: 300000
-    });
-    setDisabled(false)
-    console.log(response)
-    setMotionUrl(response.data.oss_url)
+      try {
+        const response = await axios.post('https://u213403-ac50-f8fb3f5b.westc.gpuhub.com:8443/generate_motion', {
+          prompt,
+          length
+      }, {
+        timeout: 300000
+      });
+      setDisabled(false)
+      console.log(response)
+      setMotionUrl(response.data.oss_url)
+      } catch (error) {
+        setDisabled(false)
+        message.error('出错了，请重试')
+      }
+      
     }
     return (
       <>
