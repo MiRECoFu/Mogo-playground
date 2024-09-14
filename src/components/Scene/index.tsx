@@ -3,6 +3,9 @@ import React, { useRef, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 import BVHAnimation from "../BVHAnimation";
 import { Button, Input, InputNumber, ConfigProvider, Space, message } from "antd";
 // import { Button, ConfigProvider, Space } from 'antd';
@@ -38,7 +41,20 @@ const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
     const [length, setLength] = useState<number>(196)
     const [disabled, setDisabled] = useState<boolean>(false)
-    const [motionUrl, setMotionUrl] = useState<string>()
+    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/run-on-trendmill.bvh')
+    const [fbxModel, setFbxModel] = useState<any>()
+    const [glbModel, setGlbModel] = useState<any>()
+
+     // 加载 Mixamo FBX 模型
+    useEffect(() => {
+      const loader = new FBXLoader();
+      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
+        fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
+        fbx.position.set(1, 0, 0); // 横向平移20单位
+        console.log(fbx)
+        setFbxModel(fbx);
+      });
+    }, []);
     const genMotions = async () => {
       setDisabled(true)
       try {
@@ -81,9 +97,10 @@ const Scene = () => {
           {/* 光源 */}
           <ambientLight />
         <spotLight position={[10, 10, 10]} />
-          <gridHelper args={[10, 10, 'red', 'gray']} />
+        <rectAreaLight width={5} height={5} color="white" intensity={1} position={[5, 5, 5]} />
+          <gridHelper args={[20, 20, 'red', 'gray']} />
           {/* BVH 动画 */}
-          {motionUrl && <BVHAnimation url={motionUrl} />}
+          <BVHAnimation url={motionUrl} fbx={fbxModel} />
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
           <OrbitControls />
