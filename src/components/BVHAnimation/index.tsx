@@ -14,19 +14,15 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 // import '../../../mock/singlefoot-stand.bvh'
 // const bvh = require('../../../mock/singlefoot-stand.bvh')
 
-const BVHAnimation = ({ url, fbx }: {url: string, fbx: any}) => {
+const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) => {
   const skeletonRef = useRef();
-  const [mixamoModel, setMixamoModel] = useState(null);
   const [skeletonHelper, setSkeletonHelper] = useState(null);
   const [mixer, setMixer] = useState(null);
   const [modelMixer, setModelMixer] = useState(null);
+  const [modelMixer2, setModelMixer2] = useState(null)
   const [sk, setSk] = useState(null)
   const [modelSk, setModelSk] = useState(null)
-  React.useEffect(() => {
-    if (fbx) {
-      setMixamoModel(fbx)
-    }
-  }, [fbx])
+
   // const fbx = useLoader(FBXLoader, 'https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character.fbx')
   // console.log(fbx)
   React.useEffect(() => {
@@ -68,8 +64,8 @@ const BVHAnimation = ({ url, fbx }: {url: string, fbx: any}) => {
         console.error('skeletonRef.current is not defined');
       }
 
-      if (fbx) {
-        console.log(fbx)
+      if (fbx && fbx2) {
+        // console.log(fbx)
         // const targetSkin = fbx.children[0]
         let modelSkeleton = new THREE.SkeletonHelper( fbx );
 				modelSkeleton.visible = false;
@@ -130,18 +126,28 @@ const BVHAnimation = ({ url, fbx }: {url: string, fbx: any}) => {
         if (!fbx.skeleton) {
           fbx.traverse((child) => {
             if (child.skeleton) {
-              console.log('child, skeleton', child.skeleton)
               fbx.skeleton = child.skeleton;
             }
           });
         }
+        if (!fbx2.skeleton) {
+          fbx2.traverse((child) => {
+            if (child.skeleton) {
+              fbx2.skeleton = child.skeleton;
+            }
+          });
+        }
         SkeletonUtils.retarget(fbx, skeletonHelper, retargetOptions);
+        SkeletonUtils.retarget(fbx2, skeletonHelper, retargetOptions);
         const modelClip = SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, retargetOptions);
-        console.log('modelClip', fbx.skeleton, modelClip, clip)
+        const modelClip2 = SkeletonUtils.retargetClip(fbx2, skeletonHelper, clip, retargetOptions);
+        // console.log('modelClip', fbx.skeleton, modelClip, clip)
         const newModelMixer = new THREE.AnimationMixer(fbx);
-       
+        const newModelMixer2 = new THREE.AnimationMixer(fbx2);
         newModelMixer.clipAction(modelClip).play();
+        newModelMixer2.clipAction(modelClip2).play();
         setModelMixer(newModelMixer);
+        setModelMixer2(newModelMixer2)
       }
 
       // SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, {});
@@ -161,11 +167,12 @@ const BVHAnimation = ({ url, fbx }: {url: string, fbx: any}) => {
         setSkeletonHelper(null)
         setModelSk(null)
         modelMixer?.stopAllAction()
+        modelMixer2?.stopAllAction()
         // console.log(skeletonHelper.position)
         // fbx.position.set(sk.position)
       }
     };
-  }, [url, fbx]);
+  }, [url, fbx, fbx2]);
 
   // useEffect(() => {
   //   if (mixamoModel && skeletonHelper) {
@@ -194,13 +201,16 @@ const BVHAnimation = ({ url, fbx }: {url: string, fbx: any}) => {
     // console.log(delta, 'delta')
     if (mixer) mixer.update(delta);
     if (modelMixer) modelMixer.update(delta)
-    if (fbx && sk) {
+    if (modelMixer2) modelMixer2.update(delta)
+    if (fbx && fbx2 && sk) {
       console.log(sk)
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
+      fbx2.position.set(sk.position.x - 1, sk.position.y - 0.8, sk.position.z)
     }
   });
   return <group >
     {fbx && <primitive object={fbx} />}
+    {fbx2 && <primitive object={fbx2} />}
     {sk && <primitive object={sk} />}
     {modelSk && <primitive object={modelSk} />}
   {skeletonHelper && (

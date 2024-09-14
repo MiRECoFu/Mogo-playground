@@ -1842,6 +1842,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-three/postprocessing@npm:^2.16.2":
+  version: 2.16.2
+  resolution: "@react-three/postprocessing@npm:2.16.2"
+  dependencies:
+    buffer: "npm:^6.0.3"
+    maath: "npm:^0.6.0"
+    n8ao: "npm:^1.6.6"
+    postprocessing: "npm:^6.32.1"
+    three-stdlib: "npm:^2.23.4"
+  peerDependencies:
+    "@react-three/fiber": ">=8.0"
+    react: ">=18.0"
+    three: ">= 0.138.0"
+  checksum: 10c0/3f64bbe360ea136f34ed89e4d6616817e2c370c7d47a5b0409e2841b37e407b465cfcf23e024e322c97c875e564d0fd08ee466665137b674196472c5d7b9c8eb
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -7482,6 +7499,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"maath@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "maath@npm:0.6.0"
+  peerDependencies:
+    "@types/three": ">=0.144.0"
+    three: ">=0.144.0"
+  checksum: 10c0/a9b716841d225338339fbe776c94e99f98136f24360e34c06698e2f1658bffc9b09321d2463e730810940de9801b73154de9afa6647595ae1d7b7662f4da6ef6
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^2.1.0":
   version: 2.1.0
   resolution: "make-dir@npm:2.1.0"
@@ -7820,6 +7847,16 @@ __metadata:
     duplexer2: "npm:^0.1.2"
     object-assign: "npm:^4.1.0"
   checksum: 10c0/7f17ef7e1b8f0353fc128437355460e0933a075f1d0180bd979504e374960cae514265d1113a87bbb7c60089af17d93790e0ac0d1311400e5cc8ddea7ae9ebdc
+  languageName: node
+  linkType: hard
+
+"n8ao@npm:^1.6.6":
+  version: 1.9.1
+  resolution: "n8ao@npm:1.9.1"
+  peerDependencies:
+    postprocessing: ">=6.30.0"
+    three: ">=0.137"
+  checksum: 10c0/3d3739663028fa4c5f44e0d5a5eaad24ab6e7ccb2d885a0d8fa384a4a2f0ac9d44cd4c49075b324d1b1564acc0d146da2a4f59f243b2b6bbeca28775cd98f3ab
   languageName: node
   linkType: hard
 
@@ -9017,6 +9054,15 @@ __metadata:
     picocolors: "npm:^1.0.1"
     source-map-js: "npm:^1.2.0"
   checksum: 10c0/ad6f8b9b1157d678560373696109745ab97a947d449f8a997acac41c7f1e4c0f3ca4b092d6df1387f430f2c9a319987b1780dbdc27e35800a88cde9b606c1e8f
+  languageName: node
+  linkType: hard
+
+"postprocessing@npm:^6.32.1":
+  version: 6.36.2
+  resolution: "postprocessing@npm:6.36.2"
+  peerDependencies:
+    three: ">= 0.157.0 < 0.169.0"
+  checksum: 10c0/7f83a025748fdff9f43660f013bf4b4887b872c2b47ed5b81c8289c51f45826950d99cf28fb28aac043163247f8df121faaab8791be63982610b608de7d6e352
   languageName: node
   linkType: hard
 
@@ -10252,6 +10298,7 @@ __metadata:
   dependencies:
     "@react-three/drei": "npm:^9.112.0"
     "@react-three/fiber": "npm:^8.17.7"
+    "@react-three/postprocessing": "npm:^2.16.2"
     "@types/react": "npm:^18.0.33"
     "@types/react-dom": "npm:^18.0.11"
     "@types/three": "npm:^0"
@@ -11133,6 +11180,22 @@ __metadata:
   peerDependencies:
     three: ">= 0.151.0"
   checksum: 10c0/0d5f7fb4c9ae9a7477c394950a68bcd3eea88e3b0ea787dac4096cfdfcca2298268d1832575288d37ae0f19f3028f3ff79e7d70e3966bc2e8da51c95ba4209b1
+  languageName: node
+  linkType: hard
+
+"three-stdlib@npm:^2.23.4":
+  version: 2.33.0
+  resolution: "three-stdlib@npm:2.33.0"
+  dependencies:
+    "@types/draco3d": "npm:^1.4.0"
+    "@types/offscreencanvas": "npm:^2019.6.4"
+    "@types/webxr": "npm:^0.5.2"
+    draco3d: "npm:^1.4.1"
+    fflate: "npm:^0.6.9"
+    potpack: "npm:^1.0.1"
+  peerDependencies:
+    three: ">=0.128.0"
+  checksum: 10c0/ba35f0d035877f189bcfe8228d0a731497ba620e28108ad61720e2cbbe5fc2826eeca3566cfe5fbb300456d74ddc81adf12496c14e53a744282d28ea27fc40dd
   languageName: node
   linkType: hard
 
