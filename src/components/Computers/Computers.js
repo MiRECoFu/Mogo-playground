@@ -192,7 +192,7 @@ function ScreenText({ invert, x = 0, y = 1.2, ...props }) {
       <color attach="background" args={[invert ? 'black' : '#35c19f']} />
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} />
-      <Text position={[x, y, 0]} ref={textRef} fontSize={4} letterSpacing={-0.1} color={!invert ? 'black' : '#35c19f'}>
+      <Text font={require("./Inter-Medium.woff")} position={[x, y, 0]} ref={textRef} fontSize={4} letterSpacing={-0.1} color={!invert ? 'black' : '#35c19f'}>
         Poimandres.
       </Text>
     </Screen>
