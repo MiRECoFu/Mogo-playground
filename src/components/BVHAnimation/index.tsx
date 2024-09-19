@@ -11,9 +11,6 @@ import { useLoader } from '@react-three/fiber'
 // import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-// import '../../../mock/singlefoot-stand.bvh'
-// const bvh = require('../../../mock/singlefoot-stand.bvh')
-
 const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) => {
   const skeletonRef = useRef();
   const [skeletonHelper, setSkeletonHelper] = useState(null);
@@ -205,7 +202,7 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
     if (fbx && fbx2 && sk) {
       console.log(sk)
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
-      fbx2.position.set(sk.position.x - 1, sk.position.y - 0.8, sk.position.z)
+      fbx2.position.set(sk.position.x - 1.5, sk.position.y - 0.8, sk.position.z)
     }
   });
   return <group >

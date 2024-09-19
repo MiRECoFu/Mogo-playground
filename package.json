@@ -9,12 +9,15 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@react-three/cannon": "^6.6.0",
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.7",
     "@react-three/postprocessing": "^2.16.2",
     "antd": "^5.20.6",
     "antd-style": "^3.6.3",
     "axios": "^1.7.7",
+    "lamina": "^1.1.23",
+    "leva": "^0.9.35",
     "three": "^0.168.0",
     "umi": "^4.3.20"
   },

@@ -14,6 +14,10 @@ import { createStyles } from 'antd-style';
 import styles from './style.less';
 import axios from "axios";
 import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing'
+import { Physics, useCompoundBody, usePlane } from "@react-three/cannon";
+import { Lamp } from "../Lamp";
+import { Cursor, useDragConstraint } from "../helpers/Drag";
+import { Block } from '../helpers/Block'
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -39,6 +43,59 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
     }
   `,
 }));
+
+function Floor(props) {
+  const [ref] = usePlane(() => ({ type: 'Static', ...props }))
+  return (
+    <mesh ref={ref} receiveShadow>
+      <planeGeometry args={[100, 100]} />
+      <MeshReflectorMaterial
+       blur={[300, 30]}
+       resolution={1024}
+       mixBlur={1}
+       mixStrength={180}
+       roughness={1}
+       depthScale={1.2}
+       minDepthThreshold={0.4}
+       maxDepthThreshold={1.4}
+       color="#202020"
+       metalness={0.8}
+      />
+    </mesh>
+  )
+}
+export function Chair(props) {
+  const scaleFactor = 0.1; // 缩放因子
+
+  const [ref] = useCompoundBody(() => ({
+    mass: 24,
+    linearDamping: 0.95,
+    angularDamping: 0.95,
+    shapes: [
+      { type: 'Box', mass: 10, position: [0, 0, 0].map(p => p * scaleFactor), args: [3.1, 3.1, 0.5].map(a => a * scaleFactor) },
+      { type: 'Box', mass: 10, position: [0, -1.75, 1.25].map(p => p * scaleFactor), args: [3.1, 0.5, 3.1].map(a => a * scaleFactor) },
+      { type: 'Box', mass: 1, position: [5 + -6.25, -3.5, 0].map(p => p * scaleFactor), args: [0.5, 3, 0.5].map(a => a * scaleFactor) },
+      { type: 'Box', mass: 1, position: [5 + -3.75, -3.5, 0].map(p => p * scaleFactor), args: [0.5, 3, 0.5].map(a => a * scaleFactor) },
+      { type: 'Box', mass: 1, position: [5 + -6.25, -3.5, 2.5].map(p => p * scaleFactor), args: [0.5, 3, 0.5].map(a => a * scaleFactor) },
+      { type: 'Box', mass: 1, position: [5 + -3.75, -3.5, 2.5].map(p => p * scaleFactor), args: [0.5, 3, 0.5].map(a => a * scaleFactor) }
+    ],
+    ...props
+  }));
+
+  const bind = useDragConstraint(ref);
+
+  return (
+    <group ref={ref} {...bind}>
+      <Block position={[0, 0, 0].map(p => p * scaleFactor)} scale={[3.1, 3.1, 0.5].map(s => s * scaleFactor)} />
+      <Block position={[0, -1.75, 1.25].map(p => p * scaleFactor)} scale={[3.1, 0.5, 3.1].map(s => s * scaleFactor)} />
+      <Block position={[5 + -6.25, -3.5, 0].map(p => p * scaleFactor)} scale={[0.5, 3, 0.5].map(s => s * scaleFactor)} />
+      <Block position={[5 + -3.75, -3.5, 0].map(p => p * scaleFactor)} scale={[0.5, 3, 0.5].map(s => s * scaleFactor)} />
+      <Block position={[5 + -6.25, -3.5, 2.5].map(p => p * scaleFactor)} scale={[0.5, 3, 0.5].map(s => s * scaleFactor)} />
+      <Block position={[5 + -3.75, -3.5, 2.5].map(p => p * scaleFactor)} scale={[0.5, 3, 0.5].map(s => s * scaleFactor)} />
+    </group>
+  );
+}
+
 const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
     const [length, setLength] = useState<number>(196)
@@ -56,9 +113,9 @@ const Scene = () => {
         console.log(fbx)
         setFbxModel(fbx);
       });
-      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Kachujin%20G%20Rosales.fbx', (fbx2) => {
+      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
         fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-        fbx2.position.set(1, 0, 0); // 横向平移20单位
+        fbx2.position.set(-1, 0, 0); // 横向平移20单位
         console.log(fbx2)
         setFbxModel2(fbx2);
       });
@@ -104,9 +161,11 @@ const Scene = () => {
     
           {/* 光源 */}
           <ambientLight />
-          <hemisphereLight intensity={0.15} groundColor="black" />
+          <hemisphereLight intensity={0.7} groundColor="black" />
+          <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} />
+          <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} />
           <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} />
-          <gridHelper args={[20, 20, 'red', 'gray']} />
+          {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
           {/* Main scene */}
       <group position={[-0, -1, 0]}>
         {/* Auto-instanced sketchfab model */}
@@ -116,11 +175,11 @@ const Scene = () => {
         {/* Auto-instanced sketchfab model */}
         
         {/* Plane reflections + distance blur */}
-        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh receiveShadow position={[0, 0.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[50, 50]} />
           <MeshReflectorMaterial
             blur={[300, 30]}
-            resolution={2048}
+            resolution={1024}
             mixBlur={1}
             mixStrength={180}
             roughness={1}
@@ -133,15 +192,26 @@ const Scene = () => {
         </mesh>
         {/* Bunny and a light give it more realism */}
         {/* <Bun scale={0.4} position={[0, 0.3, 0.5]} rotation={[0, -Math.PI * 0.85, 0]} /> */}
-        <pointLight distance={1.5} intensity={1} position={[-0.15, 0.7, 0]} color="orange" />
+        <pointLight distance={1.5} intensity={3} position={[-0.15, 0.7, 0]} color="orange" />
       </group>
+        {/* <Physics>
+        <Cursor />
+        <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} />
+        <Chair position={[0, 2, 2.52]} scale={[0.01, 0.01, 0.01]}/>
+        <Chair position={[1, 2, 2.52]} scale={[0.01, 0.01, 0.01]}/>
+        <Chair position={[-1.2, 2, 2.52]} rotation={[0, Math.PI / 4, 0]} scale={[0.01, 0.01, 0.01]}/>
+
+        <Chair position={[4, 2, 3.52]} rotation={[-Math.PI / 1.5, 0, 0]} scale={[0.01, 0.01, 0.01]}/>
+        
+        </Physics> */}
           {/* BVH 动画 */}
           <BVHAnimation url={motionUrl} fbx={fbxModel} fbx2={fbxModel2} />
+          {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
           <OrbitControls />
           <EffectComposer disableNormalPass>
-        <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={4} />
+        <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={2} />
         <DepthOfField target={[0, 0, 13]} focalLength={0.3} bokehScale={15} height={700} />
       </EffectComposer>
         </Canvas>
