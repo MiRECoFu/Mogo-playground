@@ -1,4 +1,4 @@
-import { AccumulativeShadows, Environment, OrbitControls, RandomizedLight } from "@react-three/drei";
+import { AccumulativeShadows, ArcballControls, Environment, GizmoHelper, GizmoViewport, Html, Lightformer, OrbitControls, RandomizedLight } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import ModelEdit from "./ModelEdit";
 import { useState, useTransition } from "react";
@@ -30,7 +30,20 @@ import { Button } from "@react-three/uikit-apfel"
 
 const SkeletonEdit = () => {
     return (
-      <Canvas shadows camera={{ position: [0, 5, 8], fov: 50 }}>
+      <Canvas shadows camera={{ position: [0, 0, 8], fov: 30 }}>
+        {/* <Html>
+          <div style={{
+            position: 'fixed',
+            backgroundColor: '#303134',
+            width: 380,
+            height: 'calc(100vh - 120px)',
+            left: 24,
+            top: 80,
+            zIndex: 111
+          }}>
+
+          </div>
+        </Html> */}
         {/* <Root backgroundColor="red">
           <Card borderRadius={32} padding={32} gap={8} flexDirection="column">
       <Text fontSize={32}>Hello World!</Text>
@@ -39,10 +52,22 @@ const SkeletonEdit = () => {
       </Text>
     </Card>
         </Root> */}
-        <ambientLight />
-        <hemisphereLight intensity={0.5} groundColor="black" />
+        <ambientLight intensity={1.2} />
+        <Environment resolution={256}>
+          <group rotation={[-Math.PI / 2, 0, 0]}>
+            <Lightformer intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+            {[2, 0, 2, 0, 2, 0, 2, 0].map((x, i) => (
+              <Lightformer key={i} form="circle" intensity={4} rotation={[Math.PI / 2, 0, 0]} position={[x, 4, i * 4]} scale={[4, 1, 1]} />
+            ))}
+            <Lightformer intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[50, 2, 1]} />
+            <Lightformer intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={[50, 2, 1]} />
+            <Lightformer intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[50, 2, 1]} />
+          </group>
+        </Environment>
+        <hemisphereLight intensity={2} groundColor="black" />
         <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} />
-        <OrbitControls />
+        {/* <OrbitControls />
+         */}
         {/* <group>
         <AccumulativeShadows temporal frames={200} color="purple" colorBlend={0.5} opacity={1} scale={10} alphaTest={0.85}>
           <RandomizedLight amount={8} radius={5} ambient={0.5} position={[5, 3, 2]} bias={0.001} />
@@ -52,6 +77,10 @@ const SkeletonEdit = () => {
         
         {/* <Model /> */}
         <ModelEdit />
+        <GizmoHelper alignment="bottom-right" margin={[80, 120]} renderPriority={1}>
+        <GizmoViewport axisColors={["hotpink", "aquamarine", "#3498DB"]} labelColor="black" />
+      </GizmoHelper>
+        <ArcballControls enableZoom={true} enablePan={false} makeDefault />
         {/* <Env /> */}
       </Canvas>
     );

@@ -193,7 +193,7 @@ function ScreenText({ invert, x = 0, y = 1.2, ...props }) {
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} />
       <Text font={require("./Inter-Medium.woff")} position={[x, y, 0]} ref={textRef} fontSize={4} letterSpacing={-0.1} color={!invert ? 'black' : '#35c19f'}>
-        Poimandres.
+        Mogo
       </Text>
     </Screen>
   )

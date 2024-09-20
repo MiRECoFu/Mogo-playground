@@ -203,6 +203,7 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
       console.log(sk)
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
       fbx2.position.set(sk.position.x - 1.5, sk.position.y - 0.8, sk.position.z)
+      fbx.rotation.set(sk.rotation.x, sk.rotation.y, sk.rotation.z)
     }
   });
   return <group >
