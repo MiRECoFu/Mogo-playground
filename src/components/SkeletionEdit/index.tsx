@@ -3,6 +3,11 @@ import { Canvas } from "@react-three/fiber";
 import ModelEdit from "./ModelEdit";
 import { useState, useTransition } from "react";
 import { useControls } from 'leva'
+import { Fullscreen, Root } from "@react-three/uikit";
+import { Defaults } from "@react-three/uikit-apfel";
+import { Container, Text } from '@react-three/uikit'
+import { Card } from "@react-three/uikit-apfel"
+import { Button } from "@react-three/uikit-apfel"
 
 // function Env() {
 //     const [preset, setPreset] = useState('sunset')
@@ -25,7 +30,15 @@ import { useControls } from 'leva'
 
 const SkeletonEdit = () => {
     return (
-      <Canvas shadows camera={{ position: [0, 3, 5], fov: 50 }}>
+      <Canvas shadows camera={{ position: [0, 5, 8], fov: 50 }}>
+        {/* <Root backgroundColor="red">
+          <Card borderRadius={32} padding={32} gap={8} flexDirection="column">
+      <Text fontSize={32}>Hello World!</Text>
+      <Text fontSize={24} opacity={0.7}>
+        This is the apfel kit.
+      </Text>
+    </Card>
+        </Root> */}
         <ambientLight />
         <hemisphereLight intensity={0.5} groundColor="black" />
         <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} />

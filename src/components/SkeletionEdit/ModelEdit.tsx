@@ -1,89 +1,92 @@
-import React, { useRef } from 'react';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { OrbitControls, TransformControls } from '@react-three/drei';
+import React, { useRef, useEffect, useState } from 'react';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import { SkeletonHelper } from 'three';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+// BoneSphere component to display a sphere at the bone's position
+interface BoneSphereProps {
+  bone: THREE.Bone;
+  onClick: (bone: THREE.Bone) => void;
+}
 
-const ModelEdit = () => {
-  const fbx = useLoader(FBXLoader, 'https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Kachujin%20G%20Rosales.fbx');  // 模型路径
-  const skeletonRef = useRef();
-  const controlsRef = useRef();
-  const meshRef = useRef();
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-  const [skeletonHelper, setSkeletonHelper] = React.useState<THREE.SkeletonHelper>()
-  const { camera, scene, gl } = useThree();
-  const [selectedBone, setSelectedBone] = React.useState<THREE.Object3D | null>(null);
-  // 骨架可视化
-  
+const BoneSphere: React.FC<BoneSphereProps> = ({ bone, onClick, isSelected }) => {
+  const [position, setPosition] = useState<[number, number, number]>([0, 0, 0]);
 
-  React.useEffect(() => {
+  // Update bone position each frame
+  useFrame(() => {
+    const bonePosition = new THREE.Vector3();
+    bone.getWorldPosition(bonePosition);
+    setPosition([bonePosition.x, bonePosition.y, bonePosition.z]);
+  });
+
+  return (
+    <mesh position={position} onClick={() => onClick(bone)}>
+      <sphereGeometry args={[0.03, 16, 16]} />
+      <meshStandardMaterial
+        color={isSelected ? '#ffcc00' : '#a6c1ee'} // 选中时高亮颜色
+        transparent={true}
+        opacity={isSelected ? 1 : 0.7} // 半透明效果
+        emissive={isSelected ? '#ffcc00' : '#000000'} // 发光效果
+        emissiveIntensity={isSelected ? 1 : 0} // 选中时发光强度
+        depthTest={false}
+      />
+    </mesh>
+  );
+};
+
+const ModelEdit: React.FC = () => {
+  const fbx = useLoader(FBXLoader, 'https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Kachujin%20G%20Rosales.fbx'); // Model path
+  const [bones, setBones] = useState<THREE.Bone[]>([]);
+  const [selectedBone, setSelectedBone] = useState<THREE.Bone | null>(null);
+
+  // Load model and extract bones
+  useEffect(() => {
     if (fbx) {
-        fbx.scale.set(0.01, 0.01, 0.01); 
-        const skinnedMesh = fbx.getObjectByProperty('type', 'SkinnedMesh');
-        if (skinnedMesh) {
-          const _skeletonHelper = new THREE.SkeletonHelper(fbx);
-          _skeletonHelper.visible = true;
-          setSkeletonHelper(_skeletonHelper)
-          skinnedMesh.parent.add(_skeletonHelper);
-
-        }
-        
-        
+      fbx.scale.set(0.01, 0.01, 0.01);
+      const skinnedMesh = fbx.getObjectByProperty('type', 'SkinnedMesh') as THREE.SkinnedMesh;
+      if (skinnedMesh && skinnedMesh.skeleton) {
+        skinnedMesh.raycast = () => {};
+        setBones(skinnedMesh.skeleton.bones); // Extract bone list
+      }
     }
-  }, [fbx])
-  // Handle mouse click events
-  const handleMouseClick = (event) => {
-    if (!skeletonHelper) return
-    // Convert mouse coordinates to normalized device coordinates
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  }, [fbx]);
 
-    // Update raycaster
-    raycaster.ray.origin.setFromMatrixPosition(camera.matrixWorld);
-    raycaster.ray.direction.set(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
+  // React.useEffect(() => {
+  //   bones && bones.forEach(bone => {
+  //     bone.renderOrder = 1; // 提高骨骼渲染顺序
+  //   });
+  // }, [bones])
 
-    const intersects = raycaster.intersectObjects(scene.children, true);
-
-    // Debug: Print intersects
-    console.log(intersects);
-
-    // Find intersection with bones in the skeletonHelper
-    const boneIntersects = intersects.filter(intersect => {
-      return intersect.object && intersect.object.parent && intersect.object.parent instanceof SkeletonHelper;
-    });
-
-    if (boneIntersects.length > 0) {
-      const bone = intersects[0].object;
-      console.log(bone, 'bbone')
-      setSelectedBone(bone);
-    } else {
-      setSelectedBone(null);
+  // Handle bone click to display bone info
+  const handleBoneClick = (bone: THREE.Bone) => {
+    if (bone === selectedBone) {
+      setSelectedBone(null)
+      return
     }
+    console.log('Selected bone:', bone);
+    setSelectedBone(bone);
   };
-
-  React.useEffect(() => {
-    window.addEventListener('click', handleMouseClick);
-    return () => {
-      window.removeEventListener('click', handleMouseClick);
-    };
-  }, [skeletonHelper, raycaster, mouse]);
-  // 实时更新
-//   useFrame(() => {
-//     if (skeletonRef.current) {
-//       skeletonRef.current.update();
-//     }
-//   });
 
   return (
     <group>
-      <primitive object={fbx} ref={meshRef} />
-      {skeletonHelper && <primitive ref={skeletonRef} object={skeletonHelper} />}
-      {/* 使用 TransformControls 让用户可以拖动骨骼节点 */}
-      {skeletonHelper && <TransformControls ref={controlsRef} object={skeletonHelper} />}
-      
-    </group>
+    <primitive object={fbx} />
+    {bones.map((bone, index) => (
+      <BoneSphere key={index} bone={bone} onClick={handleBoneClick} isSelected={selectedBone === bone} />
+    ))}
+    {/* {selectedBone && (
+      <Text
+        position={[
+          selectedBone.position.x,
+          selectedBone.position.y + 0.1, // Slightly above the bone
+          selectedBone.position.z
+        ]}
+        fontSize={0.05}
+        color="white"
+      >
+        Bone: {selectedBone.name}
+      </Text>
+    )} */}
+  </group>
   );
 };
 
