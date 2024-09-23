@@ -11,12 +11,13 @@ import { useLoader } from '@react-three/fiber'
 // import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) => {
+const BVHAnimation = ({ url, fbx, fbx2, fbx3 }: {url: string, fbx: any, fbx2: any, fbx3: any}) => {
   const skeletonRef = useRef();
   const [skeletonHelper, setSkeletonHelper] = useState(null);
   const [mixer, setMixer] = useState(null);
   const [modelMixer, setModelMixer] = useState(null);
   const [modelMixer2, setModelMixer2] = useState(null)
+  const [modelMixer3, setModelMixer3] = useState(null)
   const [sk, setSk] = useState(null)
   const [modelSk, setModelSk] = useState(null)
 
@@ -53,14 +54,8 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
       //   skeletonRef.current.add(mesh);
       // }
       
-      if (skeletonRef.current) {
-        console.log('add skeleton helper', skeletonHelper)
-        skeletonRef.current.add(skeletonHelper);
-      } else {
-        console.error('skeletonRef.current is not defined');
-      }
 
-      if (fbx && fbx2) {
+      if (fbx && fbx2 && fbx3) {
         // console.log(fbx)
         // const targetSkin = fbx.children[0]
         let modelSkeleton = new THREE.SkeletonHelper( fbx );
@@ -133,17 +128,28 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
             }
           });
         }
+        if (!fbx3.skeleton) {
+          fbx3.traverse((child) => {
+            if (child.skeleton) {
+              fbx3.skeleton = child.skeleton;
+            }
+          });
+        }
         SkeletonUtils.retarget(fbx, skeletonHelper, retargetOptions);
         SkeletonUtils.retarget(fbx2, skeletonHelper, retargetOptions);
         const modelClip = SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, retargetOptions);
         const modelClip2 = SkeletonUtils.retargetClip(fbx2, skeletonHelper, clip, retargetOptions);
+        const modelClip3 = SkeletonUtils.retargetClip(fbx3, skeletonHelper, clip, retargetOptions);
         // console.log('modelClip', fbx.skeleton, modelClip, clip)
         const newModelMixer = new THREE.AnimationMixer(fbx);
         const newModelMixer2 = new THREE.AnimationMixer(fbx2);
+        const newModelMixer3 = new THREE.AnimationMixer(fbx3);
         newModelMixer.clipAction(modelClip).play();
         newModelMixer2.clipAction(modelClip2).play();
+        newModelMixer3.clipAction(modelClip3).play()
         setModelMixer(newModelMixer);
         setModelMixer2(newModelMixer2)
+        setModelMixer3(newModelMixer3)
       }
 
       // SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, {});
@@ -164,11 +170,12 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
         setModelSk(null)
         modelMixer?.stopAllAction()
         modelMixer2?.stopAllAction()
+        modelMixer3?.stopAllAction()
         // console.log(skeletonHelper.position)
         // fbx.position.set(sk.position)
       }
     };
-  }, [url, fbx, fbx2]);
+  }, [url, fbx, fbx2, fbx3]);
 
   // useEffect(() => {
   //   if (mixamoModel && skeletonHelper) {
@@ -198,15 +205,17 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
     if (mixer) mixer.update(delta);
     if (modelMixer) modelMixer.update(delta)
     if (modelMixer2) modelMixer2.update(delta)
-    if (fbx && fbx2 && sk) {
+    if (modelMixer3) modelMixer3.update(delta)
+    if (fbx && fbx2 &&  fbx3 && sk) {
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
       fbx2.position.set(sk.position.x - 1.5, sk.position.y - 0.8, sk.position.z)
-      fbx.rotation.set(sk.rotation.x, sk.rotation.y, sk.rotation.z)
+      fbx3.position.set(sk.position.x, sk.position.y - 0.8, sk.position.z + 1.5)
     }
   });
   return <group >
     {fbx && <primitive object={fbx} />}
     {fbx2 && <primitive object={fbx2} />}
+    {fbx3 && <primitive object={fbx3} />}
     {sk && <primitive object={sk} />}
     {modelSk && <primitive object={modelSk} />}
   {skeletonHelper && (

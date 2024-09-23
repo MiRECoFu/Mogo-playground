@@ -18,6 +18,7 @@ import { Physics, useCompoundBody, usePlane } from "@react-three/cannon";
 import { Lamp } from "../Lamp";
 import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
+import { enhancePrompt } from "@/constant/LLM";
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -103,6 +104,7 @@ const Scene = () => {
     const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/run-on-trendmill.bvh')
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
+    const [fbxModel3, setFbxModel3] = useState<any>()
 
     const [useLLM, setUseLLM] = useState<boolean>(true)
 
@@ -123,6 +125,12 @@ const Scene = () => {
 
         setFbxModel2(fbx2);
       });
+      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maria%20WProp%20J%20J%20Ong.fbx', (fbx3) => {
+        fbx3.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
+        fbx3.position.set(-2, 0, 0); // 横向平移20单位
+
+        setFbxModel3(fbx3);
+      });
     }, []);
     const genMotions = async () => {
       setDisabled(true)
@@ -137,26 +145,7 @@ const Scene = () => {
             messages: [
               {
                 "role": "system",
-                "content": `你现在是一个人体行为机器学习专家。需要为一个用HumanML3D 数据集训练的文字生成动作序列的模型编写prompt。你需要将抽象的动作描述直接用英文描述成具体的动作，需要细致到具体的肢体行为，动作方向等。请你直接输出具体描述，限制在一句话，25词以内。不要有具体的和其他物体交互，只描述人体动作。如果输入的prompt 是具体的动作描述并且是英文，请直接返回原始 prompt输入不要修改。作为参考，原始数据集中只有日常行为动作、拳击动作、街舞类型。\n
-                举例：
-                input: a man rises from the ground, walks in a circle and sits back down on the ground.\n
-                output: a man rises from the ground, walks in a circle and sits back down on the ground.\n
-
-                input: 一个中世纪骑士在战斗\n
-                output: A medieval knight stands firmly, raising a sword high, then lunges forward, swinging the sword from right to left while shifting weight onto his front foot.\n
-
-                input: a man walks in a figure 8\n
-                output: a man walks in a figure 8 \n
-
-                input: a man crawls forward \n
-                output: a man crawls forward \n
-
-                input: a person walks in a circle \n
-                output: a person walks in a circle \n
-
-                input: a man is battling \n
-                output: a man is boxing
-                `
+                "content": enhancePrompt
               },
               {
                   "role": "user",
@@ -270,7 +259,7 @@ const Scene = () => {
         
         </Physics> */}
           {/* BVH 动画 */}
-          <BVHAnimation url={motionUrl} fbx={fbxModel} fbx2={fbxModel2} />
+          <BVHAnimation url={motionUrl} fbx={fbxModel} fbx2={fbxModel2} fbx3={fbxModel3} />
           {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
