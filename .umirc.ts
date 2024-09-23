@@ -7,4 +7,5 @@ export default defineConfig({
     { path: "/docs", component: "docs" },
   ],
   npmClient: 'yarn',
+  esbuildMinifyIIFE: true
 });
