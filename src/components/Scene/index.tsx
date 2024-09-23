@@ -8,7 +8,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import BVHAnimation from "../BVHAnimation";
 import { Instances, Computers } from '../Computers/Computers'
-import { Button, Input, InputNumber, ConfigProvider, Space, message } from "antd";
+import { Button, Input, InputNumber, ConfigProvider, Space, message, Checkbox } from "antd";
 // import { Button, ConfigProvider, Space } from 'antd';
 import { createStyles } from 'antd-style';
 import styles from './style.less';
@@ -104,27 +104,83 @@ const Scene = () => {
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
 
+    const [useLLM, setUseLLM] = useState<boolean>(true)
+
+    const [enhancedP, setEnhancedP] = useState<string>('')
+
      // 加载 Mixamo FBX 模型
     useEffect(() => {
       const loader = new FBXLoader();
       loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
         fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
         fbx.position.set(1, 0, 0); // 横向平移20单位
-        console.log(fbx)
+
         setFbxModel(fbx);
       });
       loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
         fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
         fbx2.position.set(-1, 0, 0); // 横向平移20单位
-        console.log(fbx2)
+
         setFbxModel2(fbx2);
       });
     }, []);
     const genMotions = async () => {
       setDisabled(true)
+      setEnhancedP('')
+      let finalP = prompt
+      if (useLLM) {
+        const apiKey = 'e5329e49d5d39274649923e8849b7e6c.fKUBmYEH7kQGfkJM'; // 替换为你的 API Key
+        const url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+
+        const data = {
+            model: "glm-4-plus",
+            messages: [
+              {
+                "role": "system",
+                "content": `你现在是一个人体行为机器学习专家。需要为一个用HumanML3D 数据集训练的文字生成动作序列的模型编写prompt。你需要将抽象的动作描述直接用英文描述成具体的动作，需要细致到具体的肢体行为，动作方向等。请你直接输出具体描述，限制在一句话，25词以内。不要有具体的和其他物体交互，只描述人体动作。如果输入的prompt 是具体的动作描述并且是英文，请直接返回原始 prompt输入不要修改。作为参考，原始数据集中只有日常行为动作、拳击动作、街舞类型。\n
+                举例：
+                input: a man rises from the ground, walks in a circle and sits back down on the ground.\n
+                output: a man rises from the ground, walks in a circle and sits back down on the ground.\n
+
+                input: 一个中世纪骑士在战斗\n
+                output: A medieval knight stands firmly, raising a sword high, then lunges forward, swinging the sword from right to left while shifting weight onto his front foot.\n
+
+                input: a man walks in a figure 8\n
+                output: a man walks in a figure 8 \n
+
+                input: a man crawls forward \n
+                output: a man crawls forward \n
+
+                input: a person walks in a circle \n
+                output: a person walks in a circle \n
+
+                input: a man is battling \n
+                output: a man is boxing
+                `
+              },
+              {
+                  "role": "user",
+                  "content": prompt
+      
+              }
+            ]
+        };
+
+        const res = await axios.post(url, data, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        console.log(res.data.choices[0].message.content)
+        finalP = res.data.choices[0].message.content
+        setEnhancedP(finalP)
+
+      }
+      
       try {
         const response = await axios.post('https://u213403-ac50-f8fb3f5b.westc.gpuhub.com:8443/generate_motion', {
-          prompt,
+          prompt: finalP,
           length
       }, {
         timeout: 300000
@@ -140,20 +196,29 @@ const Scene = () => {
     }
     return (
       <>
-        <div className={styles.actions}>
-          <Input size="large" value={prompt} onChange={(e) => {
-            setPrompt(e.target.value)
-          }} />
-          <InputNumber size="large" min={1} max={260} value={length} onChange={(e) => {
-            setLength(e || 1)
-          }} />
-          <ConfigProvider button={{
-        className: styles.linearGradientButton,
-      }}>
-          <Button type="primary" size="large" loading={disabled} onClick={genMotions}>Mogo!</Button>
-          </ConfigProvider>
-          
+        <div  className={styles.actionsWrapper}>
+          <div className={styles.actions}>
+            <Input size="large" value={prompt} onChange={(e) => {
+              setPrompt(e.target.value)
+            }} />
+            <InputNumber size="large" min={1} max={260} value={length} onChange={(e) => {
+              setLength(e || 1)
+            }} />
+            <ConfigProvider button={{
+          className: styles.linearGradientButton,
+        }}>
+            <Button type="primary" size="large" loading={disabled} onClick={genMotions}>Mogo!</Button>
+            </ConfigProvider>
+            
+          </div>
+          <Checkbox checked={useLLM} style={{
+            fontWeight: 'normal',
+          }} onChange={(v) => {
+            setUseLLM(v.target.checked)
+          }}>Use LLM to enhance performance</Checkbox>
+          {useLLM && enhancedP && <p className={styles.enhancedP}>After Enhanced: {enhancedP}</p>}
         </div>
+        
         <Canvas camera={{ position: [0, 5, 5] }}>
         
           {/* 黑色背景 */}

@@ -64,7 +64,6 @@ const ModelEdit: React.FC = () => {
       setSelectedBone(null)
       return
     }
-    console.log('Selected bone:', bone);
     setSelectedBone(bone);
   };
 

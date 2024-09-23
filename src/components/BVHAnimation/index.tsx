@@ -36,7 +36,6 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
 
       // Create a SkeletonHelper to visualize the skeleton
       const skeletonHelper = new THREE.SkeletonHelper(skeleton.bones[0]);
-      console.log(skeleton.bones, 'bones')
       setSk(skeleton.bones[0])
       skeletonHelper.skeleton = skeleton;
       skeletonHelper.visible = true; // Ensure helper is visible
@@ -200,7 +199,6 @@ const BVHAnimation = ({ url, fbx, fbx2 }: {url: string, fbx: any, fbx2: any}) =>
     if (modelMixer) modelMixer.update(delta)
     if (modelMixer2) modelMixer2.update(delta)
     if (fbx && fbx2 && sk) {
-      console.log(sk)
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
       fbx2.position.set(sk.position.x - 1.5, sk.position.y - 0.8, sk.position.z)
       fbx.rotation.set(sk.rotation.x, sk.rotation.y, sk.rotation.z)
