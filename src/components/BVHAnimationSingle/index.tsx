@@ -186,11 +186,11 @@ const BVHAnimationSingle = ({ url, fbx }: {url: string, fbx: any}) => {
   });
   return <group >
     {fbx && <primitive object={fbx} />}
-    {sk && <primitive object={sk} />}
-    {modelSk && <primitive object={modelSk} />}
-  {skeletonHelper && (
+    {/* {sk && <primitive object={sk} />} */}
+    {/* {modelSk && <primitive object={modelSk} />} */}
+  {/* {skeletonHelper && (
     <primitive object={skeletonHelper} />
-  )}
+  )} */}
 </group>
 
   // return skeleton ? (

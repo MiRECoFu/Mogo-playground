@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshReflectorMaterial, OrbitControls, useAnimations } from "@react-three/drei";
+import { AccumulativeShadows, MeshReflectorMaterial, OrbitControls, RandomizedLight, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -56,6 +56,7 @@ const Scene = () => {
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
     const [fbxModel3, setFbxModel3] = useState<any>()
+    const [inputVis, setInputVis] = useState<boolean>(true)
 
     const [useLLM, setUseLLM] = useState<boolean>(true)
 
@@ -137,7 +138,7 @@ const Scene = () => {
     return (
       <>
         <div  className={styles.actionsWrapper}>
-          <div className={styles.actions}>
+         { inputVis && <div className={styles.actions}>
             <Input size="large" value={prompt} onChange={(e) => {
               setPrompt(e.target.value)
             }} />
@@ -145,35 +146,46 @@ const Scene = () => {
               setLength(e || 1)
             }} />
             <ConfigProvider button={{
-          className: styles.linearGradientButton,
-        }}>
-            <Button type="primary" size="large" loading={disabled} onClick={genMotions}>Mogo!</Button>
+              className: styles.linearGradientButton,
+            }}>
+                <Button type="primary" size="large" loading={disabled} onClick={genMotions}>Mogo!</Button>
             </ConfigProvider>
             
-          </div>
+          </div>}
           <Checkbox checked={useLLM} style={{
             fontWeight: 'normal',
           }} onChange={(v) => {
             setUseLLM(v.target.checked)
-          }}>Use LLM to enhance performance</Checkbox>
+          }}>Use LLM to enhance performance
+            <Button onClick={(e) => {
+              e.stopPropagation()
+              setInputVis(!inputVis)
+            }} type='link'>控制输入框是否隐藏</Button>
+          </Checkbox>
           {useLLM && enhancedP && <p className={styles.enhancedP}>After Enhanced: {enhancedP}</p>}
         </div>
         
-        <Canvas camera={{ position: [0, 5, 5] }}>
+        <Canvas camera={{ position: [0, 7, 6] }}>
         
           {/* 黑色背景 */}
           <color attach="background" args={["#ffffff"]} />
     
           {/* 光源 */}
-          <ambientLight />
-          <hemisphereLight intensity={0.7} groundColor="white" />
-          {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} />
-          <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} />
-          <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
+          <ambientLight intensity={2.5} />
+          <directionalLight position={[-10, 10, 5]} intensity={3} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
+
+          </directionalLight>
+          {/* <hemisphereLight intensity={3} groundColor="white" /> */}
+          {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
+          {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
+          {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
           {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
           {/* Main scene */}
+          <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
+            <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
+          </AccumulativeShadows>
       <group position={[-0, -1, 0]}>
-
+        
         {/* Auto-instanced sketchfab model */}
         {/* <Instances>
           <Computers scale={1.5} position={[0, 0, -10]} />
@@ -181,9 +193,9 @@ const Scene = () => {
         {/* Auto-instanced sketchfab model */}
         
         {/* Plane reflections + distance blur */}
-        {/* <mesh receiveShadow position={[0, 0.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[50, 50]} />
-          <MeshReflectorMaterial
+        <mesh receiveShadow color="#9f9f9f" position={[0, 0.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[20, 20]} />
+          {/* <MeshReflectorMaterial
             blur={[300, 30]}
             resolution={1024}
             mixBlur={1}
@@ -192,10 +204,10 @@ const Scene = () => {
             depthScale={1.2}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
-            color="#ffffff"
+            color="#9f9f9f"
             metalness={0.8}
-          />
-        </mesh> */}
+          /> */}
+        </mesh>
         {/* Bunny and a light give it more realism */}
         {/* <Bun scale={0.4} position={[0, 0.3, 0.5]} rotation={[0, -Math.PI * 0.85, 0]} /> */}
         {/* <pointLight distance={1.5} intensity={3} position={[-0.15, 0.7, 0]} color="orange" />
