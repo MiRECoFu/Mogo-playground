@@ -11,7 +11,7 @@ import { useLoader } from '@react-three/fiber'
 // import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-const BVHAnimationSingle = ({ url, fbx }: {url: string, fbx: any}) => {
+const BVHAnimationSingle = ({ url, fbx, cameraControlsRef }: {url: string, fbx: any, cameraControlsRef: any}) => {
   const skeletonRef = useRef();
   const [skeletonHelper, setSkeletonHelper] = useState(null);
   const [mixer, setMixer] = useState(null);
@@ -182,9 +182,12 @@ const BVHAnimationSingle = ({ url, fbx }: {url: string, fbx: any}) => {
     if (modelMixer) modelMixer.update(delta)
     if (fbx && sk) {
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
+      cameraControlsRef.current?.setPosition(sk.position.x, sk.position.y , sk.position.z + 4)
+      // cameraControlsRef.current?.setLookAt(...sk.position)
+      // console.log(cameraControlsRef.current)
     }
   });
-  return <group >
+  return <group position={[0, -1, 0]}>
     {fbx && <primitive object={fbx} />}
     {/* {sk && <primitive object={sk} />} */}
     {/* {modelSk && <primitive object={modelSk} />} */}

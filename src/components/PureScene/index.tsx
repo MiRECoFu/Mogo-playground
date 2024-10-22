@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { AccumulativeShadows, MeshReflectorMaterial, OrbitControls, RandomizedLight, useAnimations } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { AccumulativeShadows, CameraControls, MeshReflectorMaterial, OrbitControls, RandomizedLight, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -47,6 +47,7 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
 }));
 
 
+
 // 
 const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
@@ -57,10 +58,11 @@ const Scene = () => {
     const [fbxModel2, setFbxModel2] = useState<any>()
     const [fbxModel3, setFbxModel3] = useState<any>()
     const [inputVis, setInputVis] = useState<boolean>(true)
-
+    const modelRef = useRef()
     const [useLLM, setUseLLM] = useState<boolean>(true)
 
     const [enhancedP, setEnhancedP] = useState<string>('')
+    const cameraControlsRef = useRef()
 
      // 加载 Mixamo FBX 模型
     useEffect(() => {
@@ -165,7 +167,7 @@ const Scene = () => {
           {useLLM && enhancedP && <p className={styles.enhancedP}>After Enhanced: {enhancedP}</p>}
         </div>
         
-        <Canvas camera={{ position: [0, 7, 6] }}>
+        <Canvas camera={{ position: [0, 2, 6] }}>
         
           {/* 黑色背景 */}
           <color attach="background" args={["#ffffff"]} />
@@ -184,45 +186,15 @@ const Scene = () => {
           <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
             <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
           </AccumulativeShadows>
-      <group position={[-0, -1, 0]}>
-        
-        {/* Auto-instanced sketchfab model */}
-        {/* <Instances>
-          <Computers scale={1.5} position={[0, 0, -10]} />
-        </Instances> */}
-        {/* Auto-instanced sketchfab model */}
-        
-        {/* Plane reflections + distance blur */}
-        <mesh receiveShadow color="#9f9f9f" position={[0, 0.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[20, 20]} />
-          {/* <MeshReflectorMaterial
-            blur={[300, 30]}
-            resolution={1024}
-            mixBlur={1}
-            mixStrength={180}
-            roughness={1}
-            depthScale={1.2}
-            minDepthThreshold={0.4}
-            maxDepthThreshold={1.4}
-            color="#9f9f9f"
-            metalness={0.8}
-          /> */}
-        </mesh>
-        {/* Bunny and a light give it more realism */}
-        {/* <Bun scale={0.4} position={[0, 0.3, 0.5]} rotation={[0, -Math.PI * 0.85, 0]} /> */}
-        {/* <pointLight distance={1.5} intensity={3} position={[-0.15, 0.7, 0]} color="orange" />
-         */}
-      </group>
-        {/* <Physics>
-
-        
-        </Physics> */}
+          
           {/* BVH 动画 */}
-          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} />
+          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} cameraControlsRef={cameraControlsRef}/>
           {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
-          <OrbitControls />
+          <OrbitControls enableDamping={true} dampingFactor={0.25}/>
+          {fbxModel && <CameraControls ref={cameraControlsRef} />}
+
           {/* <EffectComposer disableNormalPass>
         <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={2} />
         <DepthOfField target={[0, 0, 13]} focalLength={0.3} bokehScale={15} height={700} />
