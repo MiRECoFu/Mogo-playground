@@ -60,7 +60,7 @@ const Scene = () => {
     const [inputVis, setInputVis] = useState<boolean>(true)
     const modelRef = useRef()
     const [useLLM, setUseLLM] = useState<boolean>(true)
-
+    const [editEnhancePrompt, setEditEnhancedPrompt] = useState<string>(enhancePrompt)
     const [enhancedP, setEnhancedP] = useState<string>('')
     const cameraControlsRef = useRef()
 
@@ -99,7 +99,7 @@ const Scene = () => {
             messages: [
               {
                 "role": "system",
-                "content": enhancePrompt
+                "content": editEnhancePrompt
               },
               {
                   "role": "user",
@@ -141,10 +141,13 @@ const Scene = () => {
       <>
         <div  className={styles.actionsWrapper}>
          { inputVis && <div className={styles.actions}>
-            <Input size="large" value={prompt} onChange={(e) => {
+            <Input.TextArea style={{flex: 1}} rows={5} value={editEnhancePrompt} onChange={(e) => {
+              setEditEnhancedPrompt(e.target.value)
+            }} />
+            <Input style={{width: '500px'}} size="large" value={prompt} onChange={(e) => {
               setPrompt(e.target.value)
             }} />
-            <InputNumber size="large" min={1} max={260} value={length} onChange={(e) => {
+            <InputNumber style={{width: '65px'}} size="large" min={1} max={260} value={length} onChange={(e) => {
               setLength(e || 1)
             }} />
             <ConfigProvider button={{
