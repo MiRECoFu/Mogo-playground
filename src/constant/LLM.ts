@@ -11,6 +11,8 @@ The person takes 4 steps backwards.\n
 The person was pushed but did not fall.\n
 This person kicks with his right leg then jabs several times.\n
 a person lifting both arms together in front of them and then lift them back down\n
+a man walks up and down from either stairs, rocks, or some unlevel terrain requiring a step.\n
+a person with dance moves\n
 注意：1.不要写具体的人物,动作主体均为 a man、a person.因为训练集中没有具体的人物，比如：剑客、魔法师、士兵等，你需要尽可能通过语言描述肢体动作来表达他的形象。
 2.不要写携带的物体，因为训练集中没有具体的物体，比如：剑、刀、枪等，你需要尽可能通过语言描述肢体动作来表达。
 3.你的描述要尽可能的用词简单清晰，不要使用复杂词汇。
@@ -20,7 +22,7 @@ input: a man rises from the ground, walks in a circle and sits back down on the 
 output: a man rises from the ground, walks in a circle and sits back down on the ground.\n
 
 input: 一个中世纪骑士在战斗\n
-output: A person stands firmly, raising a sword high, then lunges forward, swinging the sword from right to left while shifting weight onto his front foot.\n
+output: A person stands firmly, raising a hand high, then lunges forward, swinging the sword from right to left while shifting weight onto his front foot.\n
 
 input: a man walks in a figure 8\n
 output: a man walks in a figure 8 \n
