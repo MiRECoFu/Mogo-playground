@@ -24,10 +24,11 @@ import BVHAnimationCapture from "../BVHAnimationCapture";
 
 const MoCap: React.FC = () => {
     const [rawVideoUrl, setRawVideoUrl] = useState<string>()
-    const [bvhUrl, setBvhUrl] = useState<string>()
+    const [bvhUrl, setBvhUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/UpDP/output.bvh')
     const [mocapUrl, setMocalUrl] = useState<string>()
     const [loading, setLoading] = useState<boolean>(false)
     const [fbxModel, setFbxModel] = useState<any>()
+    
     useEffect(() => {
         const loader = new FBXLoader();
         loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Kachujin%20G%20Rosales.fbx', (fbx) => {
@@ -113,18 +114,18 @@ const MoCap: React.FC = () => {
             }
             </div>
             <div className={styles.canvas}>
-            <Canvas camera={{ position: [0, 120, -510] }}>
-        
+            {/* <Canvas camera={{ position: [0, 120, -510] }}> */}
+              <Canvas camera={{ position: [0, 0, 1.5] }}>
                 {/* 黑色背景 */}
-                <color attach="background" args={["#000000"]} />
+                <color attach="background" args={["#303030"]} />
         
                 {/* 光源 */}
                 <ambientLight />
-                <hemisphereLight intensity={0.7} groundColor="black" />
-                <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} />
-                <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} />
+                {/* <hemisphereLight intensity={0.7} groundColor="black" /> */}
+                {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} />
+                <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
                 <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} />
-                <directionalLight position={[-10, 10, 5]} intensity={3} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
+                <directionalLight position={[-10, 10, 5]} intensity={0.8} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
 
                 </directionalLight>
                 {/* <hemisphereLight intensity={3} groundColor="white" /> */}
@@ -133,9 +134,9 @@ const MoCap: React.FC = () => {
                 {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
                 {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
                 {/* Main scene */}
-                <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
+                {/* <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
                 <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
-                </AccumulativeShadows>
+                </AccumulativeShadows> */}
                 
                 {/* BVH 动画 */}
                 {bvhUrl && <BVHAnimationCapture url={bvhUrl} fbx={fbxModel} />}
