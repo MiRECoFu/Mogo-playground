@@ -273,6 +273,7 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
   useEffect(() => {
     (async () => {
       // await viewer.loadVrm(AvatarSample_A);
+      
       const loader = new GLTFLoader();
       const helperRoot = new THREE.Group();
       loader.register((parser) => new VRMLoaderPlugin(parser, { helperRoot: helperRoot }));
@@ -280,7 +281,7 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
         AvatarSample_A,
         async (vrm) => {
           if (modelRef.current) {
-            
+            modelRef.current.clear()
             
             if (blobURL) {
               const VRMAnimation = await loadVRMAnimation(blobURL);
@@ -289,6 +290,9 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
               const clip = createVRMAnimationClip(VRMAnimation!, vrm.userData.vrm);
               console.log(clip)
               vrm.userData.vrm.scene.name = 'VRMRoot';
+              if (!modelRef.current) {
+                
+              }
               modelRef.current.add(vrm.scene);
               // VRMUtils.rotateVRM0(vrm.userData.vrm);
               const vrmMixer = new THREE.AnimationMixer(vrm.userData.vrm.scene)
