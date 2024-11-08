@@ -168,7 +168,7 @@ const Scene = () => {
       }
       
       try {
-        const response = await axios.post('https://u213403-ac50-f8fb3f5b.westc.gpuhub.com:8443/generate_motion', {
+        const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
           prompt: finalP,
           length
       }, {
