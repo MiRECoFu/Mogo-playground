@@ -19,6 +19,7 @@ import { Lamp } from "../Lamp";
 import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
 import { enhancePrompt } from "@/constant/LLM";
+import DownloadButton from "../DownloadBvh";
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -197,6 +198,7 @@ const Scene = () => {
           className: styles.linearGradientButton,
         }}>
             <Button type="primary" size="large" loading={disabled} onClick={genMotions}>Mogo!</Button>
+            {!disabled && <DownloadButton url={motionUrl} />}
             </ConfigProvider>
             
           </div>

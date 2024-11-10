@@ -21,6 +21,7 @@ import { enhancePrompt } from "@/constant/LLM";
 import { div } from "three/webgpu";
 import BVHAnimationSingle from "../BVHAnimationSingle";
 import BVHAnimationCapture from "../BVHAnimationCapture";
+import DownloadButton from "../DownloadBvh";
 
 const MoCap: React.FC = () => {
     const [rawVideoUrl, setRawVideoUrl] = useState<string>()
@@ -28,6 +29,7 @@ const MoCap: React.FC = () => {
     const [mocapUrl, setMocalUrl] = useState<string>()
     const [loading, setLoading] = useState<boolean>(false)
     const [fbxModel, setFbxModel] = useState<any>()
+    const [dynamicCam, setDynamicCam] = useState<boolean>(true)
     
     useEffect(() => {
         const loader = new FBXLoader();
@@ -63,7 +65,7 @@ const MoCap: React.FC = () => {
             try {
                 const response = await axios.post('http://121.196.206.169:6006/mo_cap', {
                     video_url: info.file.response.video_url,
-                  static_cam: true
+                  static_cam: !dynamicCam
               }, {
                 timeout: 300000
               });
@@ -93,7 +95,23 @@ const MoCap: React.FC = () => {
                 <InboxOutlined />
             </p> */}
             <p style={{color: '#fff'}}>Click or drag file to this area to upload</p>
+            
             </Upload.Dragger>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '6px 12px'
+            }}>
+            <Checkbox style={{color: '#fff'}} onChange={(e) => {
+              // console.log(e)
+              setDynamicCam(e.target.checked)
+            }} checked={dynamicCam}>动态镜头</Checkbox>
+            {
+              !loading && <DownloadButton url={bvhUrl} />
+            }
+            </div>
             </div>
             {
                 loading
@@ -106,9 +124,11 @@ const MoCap: React.FC = () => {
                     loading...
                 </div>
             }
+            
             {mocapUrl &&
             <video style={{
-                width: '100%'
+                width: '100%',
+                marginTop: '80px'
             }} src={mocapUrl} autoPlay
             controls></video>
             }
