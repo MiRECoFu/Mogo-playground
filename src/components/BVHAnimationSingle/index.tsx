@@ -11,7 +11,7 @@ import { useLoader } from '@react-three/fiber'
 // import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-const BVHAnimationSingle = ({ url, fbx, cameraControlsRef }: {url: string, fbx: any, cameraControlsRef: any}) => {
+const BVHAnimationSingle = ({ url, fbx }: {url: string, fbx: any, }) => {
   const skeletonRef = useRef();
   const [skeletonHelper, setSkeletonHelper] = useState(null);
   const [mixer, setMixer] = useState(null);
@@ -31,13 +31,14 @@ const BVHAnimationSingle = ({ url, fbx, cameraControlsRef }: {url: string, fbx: 
     //     console.log(fbx)
     //     setMixamoModel(fbx);
     //   });
-    loader.load(url,  (result) => {
+    url && loader.load(url,  (result) => {
       const { skeleton, clip } = result;
       
 
       // Create a SkeletonHelper to visualize the skeleton
       const skeletonHelper = new THREE.SkeletonHelper(skeleton.bones[0]);
       setSk(skeleton.bones[0])
+      console.log('skeleton.bones', skeleton.bones)
       skeletonHelper.skeleton = skeleton;
       skeletonHelper.visible = true; // Ensure helper is visible
       // skeletonHelper.material = new THREE.LineBasicMaterial({
@@ -109,6 +110,7 @@ const BVHAnimationSingle = ({ url, fbx, cameraControlsRef }: {url: string, fbx: 
 					}
 
 				};
+
         
 
         // const options = {
@@ -182,18 +184,25 @@ const BVHAnimationSingle = ({ url, fbx, cameraControlsRef }: {url: string, fbx: 
     if (modelMixer) modelMixer.update(delta)
     if (fbx && sk) {
       fbx.position.set(sk.position.x + 1, sk.position.y - 0.8, sk.position.z)
-      cameraControlsRef.current?.setPosition(sk.position.x, sk.position.y , sk.position.z + 4)
+      const leftShoulderBone = fbx.getObjectByName('mixamorigLeftShoulder');
+      if (leftShoulderBone) {
+        // 设置旋转补偿
+        leftShoulderBone.rotation.x -= 1.567; // 这里的值是近似的误差调整
+        leftShoulderBone.rotation.y += 0.238;
+        leftShoulderBone.rotation.z += 1.584;
+      }
+      // cameraControlsRef.current?.setPosition(sk.position.x, sk.position.y , sk.position.z + 4)
       // cameraControlsRef.current?.setLookAt(...sk.position)
       // console.log(cameraControlsRef.current)
     }
   });
-  return <group position={[0, -1, 0]}>
+  return <group position={[0, 0, 0]}>
     {fbx && <primitive object={fbx} />}
-    {/* {sk && <primitive object={sk} />} */}
-    {/* {modelSk && <primitive object={modelSk} />} */}
-  {/* {skeletonHelper && (
+    {sk && <primitive object={sk} />}
+    {modelSk && <primitive object={modelSk} />}
+  {skeletonHelper && (
     <primitive object={skeletonHelper} />
-  )} */}
+  )}
 </group>
 
   // return skeleton ? (

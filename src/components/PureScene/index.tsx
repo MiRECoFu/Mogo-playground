@@ -20,6 +20,9 @@ import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
 import { enhancePrompt } from "@/constant/LLM";
 import BVHAnimationSingle from "../BVHAnimationSingle";
+// import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
+// import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
+import TrumpModel from '@/assets/trump/donald_trump.glb'
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -66,12 +69,45 @@ const Scene = () => {
 
      // 加载 Mixamo FBX 模型
     useEffect(() => {
-      const loader = new FBXLoader();
-      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
-        fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-        fbx.position.set(1, 0, 0); // 横向平移20单位
+      // const loader = new FBXLoader();
+      // const textureLoader = new THREE.TextureLoader();
+      // loader.load(TrumpModel, (fbx) => {
+      //   fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
+      //   fbx.position.set(1, 0, 0); // 横向平移20单位
+      //   fbx.traverse((node) => {
+      //     if (node.isMesh) {
+      //         // 手动加载并应用纹理
+      //         node.material.map = textureLoader.load(trumpTexture);
+      //         node.material.needsUpdate = true;
+      //     }
+      //     console.log(node)
+      //     // if (node.isBone && node.name =="BipTrump") {
+      //     //   console.log('adsfdasfas')
+      //     //   node.rotation.set(0, 0, 0)
+      //     // }
+      // });
+        
+      //   // fbx.rotation.set(90, 0, 0)
+      //   // fbx.rotation.x = -Math.PI / 2;
 
-        setFbxModel(fbx);
+      //   setFbxModel(fbx);
+      // });
+      const loader = new GLTFLoader();
+      loader.setResourcePath('src/assets/trump/donald_t/')
+      loader.load(TrumpModel, (gltf) => {
+        gltf.scene.scale.set(0.1, 0.1, 0.1); // Adjust the scale as needed
+        gltf.scene.position.set(1, 0, 0); 
+        gltf.scene.traverse((node) => {
+          if (node.type === 'Bone') {
+            
+            node.name = node.name.split('_')[0]
+            node.rotation.set(0, 0, 0)
+            console.log(node)
+          }
+        })
+        console.log(gltf.scene)
+        setFbxModel(gltf.scene);
+        
       });
     //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
     //     fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
@@ -141,10 +177,10 @@ const Scene = () => {
       <>
         <div  className={styles.actionsWrapper}>
          { inputVis && <div className={styles.actions}>
-            <Input.TextArea style={{flex: 1}} rows={5} value={editEnhancePrompt} onChange={(e) => {
+            {/* <Input.TextArea style={{flex: 1}} rows={5} value={editEnhancePrompt} onChange={(e) => {
               setEditEnhancedPrompt(e.target.value)
-            }} />
-            <Input style={{width: '500px'}} size="large" value={prompt} onChange={(e) => {
+            }} /> */}
+            <Input style={{width: '80%'}} size="large" value={prompt} onChange={(e) => {
               setPrompt(e.target.value)
             }} />
             <InputNumber style={{width: '65px'}} size="large" min={1} max={260} value={length} onChange={(e) => {
@@ -191,11 +227,11 @@ const Scene = () => {
           </AccumulativeShadows>
           
           {/* BVH 动画 */}
-          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} cameraControlsRef={cameraControlsRef}/>
+          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} />
           {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
-          <OrbitControls enableDamping={true} dampingFactor={0.25}/>
+          <OrbitControls />
           {fbxModel && <CameraControls ref={cameraControlsRef} />}
 
           {/* <EffectComposer disableNormalPass>
