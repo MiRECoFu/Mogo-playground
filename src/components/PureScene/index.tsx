@@ -97,16 +97,29 @@ const Scene = () => {
       loader.load(TrumpModel, (gltf) => {
         gltf.scene.scale.set(0.1, 0.1, 0.1); // Adjust the scale as needed
         gltf.scene.position.set(1, 0, 0); 
-        gltf.scene.traverse((node) => {
-          if (node.type === 'Bone') {
-            
-            node.name = node.name.split('_')[0]
-            node.rotation.set(0, 0, 0)
-            console.log(node)
-          }
-        })
-        console.log(gltf.scene)
-        setFbxModel(gltf.scene);
+        const fbxLoader = new FBXLoader();
+        fbxLoader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
+              // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
+              // fbx.position.set(1, 0, 0); // 横向平移20单位
+      
+              
+              gltf.scene.traverse((node) => {
+                if (node.type === 'Bone') {
+                  
+                  node.name = node.name.split('_')[0]
+                  node.rotation.set(0, 0, 0)
+                  console.log(node)
+                  fbx.traverse((fn) => {
+                    if (fn.type === 'Bone' && fn.name == node.name) {
+                      console.log(fn.name, fn.rotation.x - node.rotation.x, fn.rotation.y - node.rotation.y, fn.rotation.z - node.rotation.z)
+                      node.rotation.set(fn.rotation.x, fn.rotation.y, fn.rotation.z)
+                    }
+                  })
+                }
+              })
+              console.log(gltf.scene)
+              setFbxModel(gltf.scene);
+            });
         
       });
     //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
