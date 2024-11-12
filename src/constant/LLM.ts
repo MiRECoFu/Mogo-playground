@@ -39,7 +39,8 @@ output: a man is boxing
 
 export const expressionPrompt = `你现在是个人类表情专家，你需要根据一个动作描述，来输出这个动作需要的表情。表情列表如下：
 ['Surprised', 'aa', 'angry', 'blink', 'blinkLeft', 'blinkRight', 'ee', 'happy', 'ih', 'nuetral', 'oh', 'ou', 'relaxed', 'sad']
-你可以同时选择多种表情来阐述这个动作，并同时输出这个表情对应的权重 weight,权重值0 - 1。
+其中 ''aa', 'ee', 'ih', 'oh', 'ou'是不同元音的口型
+你可以同时选择多种表情和口型来阐述这个动作，并同时输出这个表情对应的权重 weight,权重值0 - 1。
 输出示例：
 [{
     "expressionName": "Surprised",
