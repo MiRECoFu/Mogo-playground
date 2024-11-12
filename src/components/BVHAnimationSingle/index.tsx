@@ -232,8 +232,6 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
             
             if (blobURL) {
               const VRMAnimation = await loadVRMAnimation(blobURL);
-              console.log(vrm.userData.vrm)
-              console.log('vrm11', vrm)
               setVrm(vrm.userData.vrm)
               const clip = createVRMAnimationClip(VRMAnimation!, vrm.userData.vrm);
               console.log(clip)
@@ -242,7 +240,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
                 
               }
               modelRef.current.add(vrm.scene);
-              // VRMUtils.rotateVRM0(vrm.userData.vrm);
+              VRMUtils.rotateVRM0(vrm.userData.vrm);
               const vrmMixer = new THREE.AnimationMixer(vrm.userData.vrm.scene)
               vrmMixer.clipAction(clip).play()
               setVrmMixer(vrmMixer)

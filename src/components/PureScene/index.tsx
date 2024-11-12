@@ -261,9 +261,9 @@ const Scene = () => {
     
           {/* 光源 */}
           <ambientLight intensity={1} />
-          {/* <directionalLight position={[-10, 10, 5]} intensity={3} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
+          <directionalLight position={[-10, 10, 5]} intensity={0.5} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
 
-          </directionalLight> */}
+          </directionalLight>
           <hemisphereLight intensity={1} groundColor="white" />
           {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
           {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
