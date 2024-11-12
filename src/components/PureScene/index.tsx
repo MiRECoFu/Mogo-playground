@@ -22,7 +22,7 @@ import { enhancePrompt } from "@/constant/LLM";
 import BVHAnimationSingle from "../BVHAnimationSingle";
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
 // import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
-import TrumpModel from '@/assets/trump/donald_trump.glb'
+
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -56,7 +56,7 @@ const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
     const [length, setLength] = useState<number>(196)
     const [disabled, setDisabled] = useState<boolean>(false)
-    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/run-on-trendmill.bvh')
+    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/UpDP/output.bvh')
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
     const [fbxModel3, setFbxModel3] = useState<any>()
@@ -92,36 +92,36 @@ const Scene = () => {
 
       //   setFbxModel(fbx);
       // });
-      const loader = new GLTFLoader();
-      loader.setResourcePath('src/assets/trump/donald_t/')
-      loader.load(TrumpModel, (gltf) => {
-        gltf.scene.scale.set(0.1, 0.1, 0.1); // Adjust the scale as needed
-        gltf.scene.position.set(1, 0, 0); 
-        const fbxLoader = new FBXLoader();
-        fbxLoader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
-              // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-              // fbx.position.set(1, 0, 0); // 横向平移20单位
+      // const loader = new GLTFLoader();
+      // loader.setResourcePath('src/assets/trump/donald_t/')
+      // loader.load(TrumpModel, (gltf) => {
+      //   gltf.scene.scale.set(0.1, 0.1, 0.1); // Adjust the scale as needed
+      //   gltf.scene.position.set(1, 0, 0); 
+      //   const fbxLoader = new FBXLoader();
+      //   fbxLoader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
+      //         // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
+      //         // fbx.position.set(1, 0, 0); // 横向平移20单位
       
               
-              gltf.scene.traverse((node) => {
-                if (node.type === 'Bone') {
+      //         gltf.scene.traverse((node) => {
+      //           if (node.type === 'Bone') {
                   
-                  node.name = node.name.split('_')[0]
-                  node.rotation.set(0, 0, 0)
-                  console.log(node)
-                  fbx.traverse((fn) => {
-                    if (fn.type === 'Bone' && fn.name == node.name) {
-                      console.log(fn.name, fn.rotation.x - node.rotation.x, fn.rotation.y - node.rotation.y, fn.rotation.z - node.rotation.z)
-                      node.rotation.set(fn.rotation.x, fn.rotation.y, fn.rotation.z)
-                    }
-                  })
-                }
-              })
-              console.log(gltf.scene)
-              setFbxModel(gltf.scene);
-            });
+      //             node.name = node.name.split('_')[0]
+      //             node.rotation.set(0, 0, 0)
+      //             console.log(node)
+      //             fbx.traverse((fn) => {
+      //               if (fn.type === 'Bone' && fn.name == node.name) {
+      //                 console.log(fn.name, fn.rotation.x - node.rotation.x, fn.rotation.y - node.rotation.y, fn.rotation.z - node.rotation.z)
+      //                 node.rotation.set(fn.rotation.x, fn.rotation.y, fn.rotation.z)
+      //               }
+      //             })
+      //           }
+      //         })
+      //         console.log(gltf.scene)
+      //         setFbxModel(gltf.scene);
+      //       });
         
-      });
+      // });
     //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
     //     fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
     //     fbx2.position.set(-1, 0, 0); // 横向平移20单位
@@ -171,7 +171,7 @@ const Scene = () => {
       }
       
       try {
-        const response = await axios.post('https://u213403-ac50-f8fb3f5b.westc.gpuhub.com:8443/generate_motion', {
+        const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
           prompt: finalP,
           length
       }, {
@@ -235,10 +235,10 @@ const Scene = () => {
           {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
           {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
           {/* Main scene */}
-          <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
+          {/* <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
             <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
           </AccumulativeShadows>
-          
+           */}
           {/* BVH 动画 */}
           <BVHAnimationSingle url={motionUrl} fbx={fbxModel} />
           {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
