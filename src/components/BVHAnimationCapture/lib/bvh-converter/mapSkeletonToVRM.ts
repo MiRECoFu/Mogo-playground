@@ -365,12 +365,10 @@ export function mapSkeletonToVRM(root: THREE.Bone): Map<VRMHumanBoneName, THREE.
   if (hips == null) {
     throw new Error('Cannot find hips.');
   }
-  console.log('hips', hips)
   result.set('hips', hips as THREE.Bone);
 
   // find chest candidate - descendants of the hips which has three or more children
   const chestCands = objectTraverseFilter(hips, (obj) => {
-    console.log(obj)
     return obj !== hips && obj.children.length >= 3;
   }) as THREE.Bone[];
   const chestCand = pickByProbability(
@@ -384,18 +382,7 @@ export function mapSkeletonToVRM(root: THREE.Bone): Map<VRMHumanBoneName, THREE.
     throw new Error('Cannot find chest.');
   }
 
-  // const [_, chest, upperChest] = determineSpineBones(hips, chestCand);
-  const spine = objectBFS(root, (obj) => {
-    return obj.name === 'Spine'
-  }) as THREE.Bone;
-  const chest = objectBFS(root, (obj) => {
-    return obj.name === 'Spine1'
-  }) as THREE.Bone;
-  const upperChest = objectBFS(root, (obj) => {
-    return obj.name === 'Spine2'
-  }) as THREE.Bone;
-  
-  console.log('[spine, chest, upperChest]', [spine, chest, upperChest])
+  const [spine, chest, upperChest] = determineSpineBones(hips, chestCand);
   result.set('spine', spine);
   result.set('chest', chest);
   if (upperChest != null) {
@@ -509,6 +496,6 @@ export function mapSkeletonToVRM(root: THREE.Bone): Map<VRMHumanBoneName, THREE.
   if (rightEye != null) {
     result.set('rightEye', rightEye);
   }
-
+  console.log(result, 'res')
   return result;
 }

@@ -18,8 +18,8 @@ import { Physics, useCompoundBody, usePlane } from "@react-three/cannon";
 import { Lamp } from "../Lamp";
 import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
-import { enhancePrompt } from "@/constant/LLM";
-import BVHAnimationSingle from "../BVHAnimationSingle";
+import { enhancePrompt, expressionPrompt } from "@/constant/LLM";
+import BVHAnimationSingle, { IExpression } from "../BVHAnimationSingle";
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
 // import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
 
@@ -56,7 +56,7 @@ const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
     const [length, setLength] = useState<number>(196)
     const [disabled, setDisabled] = useState<boolean>(false)
-    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/UpDP/output.bvh')
+    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/run-on-trendmill.bvh')
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
     const [fbxModel3, setFbxModel3] = useState<any>()
@@ -66,6 +66,7 @@ const Scene = () => {
     const [editEnhancePrompt, setEditEnhancedPrompt] = useState<string>(enhancePrompt)
     const [enhancedP, setEnhancedP] = useState<string>('')
     const cameraControlsRef = useRef()
+    const [expressionList, setExpressionList] = useState<IExpression[]>([])
 
      // 加载 Mixamo FBX 模型
     useEffect(() => {
@@ -139,9 +140,11 @@ const Scene = () => {
       setDisabled(true)
       setEnhancedP('')
       let finalP = prompt
+      const apiKey = 'e5329e49d5d39274649923e8849b7e6c.fKUBmYEH7kQGfkJM'; // 替换为你的 API Key
+      const url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
       if (useLLM) {
-        const apiKey = 'e5329e49d5d39274649923e8849b7e6c.fKUBmYEH7kQGfkJM'; // 替换为你的 API Key
-        const url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        
+        
 
         const data = {
             model: "glm-4-plus",
@@ -169,6 +172,38 @@ const Scene = () => {
         setEnhancedP(finalP)
 
       }
+      const data = {
+        model: "glm-4-plus",
+        messages: [
+          {
+            "role": "system",
+            "content": expressionPrompt
+          },
+          {
+              "role": "user",
+              "content": prompt
+  
+          }
+        ]
+    };
+      const res = await axios.post(url, data, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        }
+    })
+    console.log(res.data.choices[0].message.content)
+    const finalE = res.data.choices[0].message.content
+    console.log('finalE', finalE)
+    const jsonStr = finalE.split('```json')[1].split('```')[0]
+    try {
+      console.log(jsonStr)
+      const exp = JSON.parse(jsonStr)
+      setExpressionList(exp)
+    } catch (error) {
+      console.error(error)
+    }
+    // setEnhancedP(finalP)
       
       try {
         const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
@@ -222,14 +257,14 @@ const Scene = () => {
         <Canvas camera={{ position: [0, 2, 6] }}>
         
           {/* 黑色背景 */}
-          <color attach="background" args={["#ffffff"]} />
+          <color attach="background" args={["#f5f5f5"]} />
     
           {/* 光源 */}
-          <ambientLight intensity={2.5} />
-          <directionalLight position={[-10, 10, 5]} intensity={3} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
+          <ambientLight intensity={1} />
+          {/* <directionalLight position={[-10, 10, 5]} intensity={3} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
 
-          </directionalLight>
-          {/* <hemisphereLight intensity={3} groundColor="white" /> */}
+          </directionalLight> */}
+          <hemisphereLight intensity={1} groundColor="white" />
           {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
           {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
           {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
@@ -240,7 +275,7 @@ const Scene = () => {
           </AccumulativeShadows>
            */}
           {/* BVH 动画 */}
-          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} />
+          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} expressions={expressionList} />
           {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}

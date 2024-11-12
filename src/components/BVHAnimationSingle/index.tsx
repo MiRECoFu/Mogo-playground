@@ -12,8 +12,8 @@ import { useLoader } from '@react-three/fiber'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { Viewer } from '../BVHAnimationCapture/features/vrmViewer/viewer';
-import AvatarSample_A from '@/assets/trump/trump.vrm';
-// import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_A.vrm'
+// import AvatarSample_A from '@/assets/trump/trump.vrm';
+import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_A.vrm'
 import { useAnimationFrame } from '@/utils/useAnimationFrame';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm";
@@ -22,11 +22,19 @@ import { loadVRMAnimation } from "../BVHAnimationCapture/lib/VRMAnimation/loadVR
 import { Model } from "../BVHAnimationCapture/features/vrmViewer/Model";
 import { VRMLoader } from "three-stdlib";
 import { createVRMAnimationClip } from "@pixiv/three-vrm-animation";
+let blinkTimer = 0; // 计时器初始化为0
+const blinkInterval = 2; // 每隔2秒眨一次眼，可以调整间隔时间
+
 interface FileBlob {
     blob: Blob;
     name: string;
   }
-const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
+
+export interface IExpression {
+  expressionName: string
+  weight: number
+}
+const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, expressions: IExpression[]}) => {
   const skeletonRef = useRef();
   const [model] = useState<Model>(new Model());
   const [skeletonHelper, setSkeletonHelper] = useState(null);
@@ -46,6 +54,24 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
   const bvhLoader = new BVHLoader();
   const [vrm, setVrm] = useState<VRM>()
   const modelRef = useRef();
+  const [smile, setSmile] = useState(1);
+  const setFaceExpression = (vrm: any, expressionName: string, weight: number) => {
+    if (vrm && vrm.expressionManager) {
+      const expression = vrm.expressionManager._expressionMap[expressionName];
+      if (expression) {
+        expression.weight = weight;
+        vrm.expressionManager.update(); // 更新表情状态
+      }
+    }
+  };
+
+
+  useEffect(() => {
+    expressions.forEach((exp) => {
+      setFaceExpression(vrm, exp.expressionName, exp.weight);
+    })
+    
+  }, [expressions, vrm]);
 
   const initializeState = () => {
     setError('');
@@ -61,21 +87,21 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
     return parts.join('.');
   };
 
-  const convertWrapper = async (file: File) => {
+  const convertWrapper = async (name: string, bvh: any) => {
     setNowConvert(true);
     let isPropertyConverted = true;
     try {
-      if (!file.name.toLowerCase().endsWith('.bvh')) {
-        throw new Error('Uploaded file is not a BVH file.');
-      }
-      const fileText = await file.text();
+      // if (!file.name.toLowerCase().endsWith('.bvh')) {
+      //   throw new Error('Uploaded file is not a BVH file.');
+      // }
+      // const fileText = await file.text();
 
-      const bvh = bvhLoader.parse(fileText);
+      // const bvh = bvhLoader.parse(fileText);
       const vrmaBuffer = await convertBVHToVRMAnimation(bvh, {
         scale: location.hash.includes('NO_SCALING') ? 1.0 : 0.01
       });
 
-      const vrmaDict: FileBlob = { blob: new Blob([vrmaBuffer]), name: file.name };
+      const vrmaDict: FileBlob = { blob: new Blob([vrmaBuffer]), name: name };
       setBlobURL(URL.createObjectURL(vrmaDict.blob));
       console.log(vrmaDict)
       vrmaBlob.current = vrmaDict;
@@ -91,27 +117,6 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
     }
   };
 
-
-
-  const fetchAndConvertBVH = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch BVH file from URL.');
-      }
-  
-      // 将响应内容读取为 Blob
-      const bvhBlob = await response.blob();
-      
-      // 将 Blob 转换为 File 对象（提供必要的文件名和 MIME 类型）
-      const bvhFile = new File([bvhBlob], 'downloaded.bvh', { type: 'application/octet-stream' });
-  
-      // 调用 convertWrapper 函数并传递文件
-      await convertWrapper(bvhFile);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
   
   // const fbx = useLoader(FBXLoader, 'https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character.fbx')
   // console.log(fbx)
@@ -119,40 +124,19 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
     initializeState()
     const loader = new BVHLoader();
     
-    // const fbxLoader = new FBXLoader();
-    // fbxLoader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character.fbx', (fbx) => {
-    //     // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-    //     console.log(fbx)
-    //     setMixamoModel(fbx);
-    //   });
-    if (url) {
-      fetchAndConvertBVH(url)
-    }
    
     loader.load(url,  async (result) => {
-      console.log(result)
       const { skeleton, clip } = result;
       // const boneSet = new Set<THREE.Object3D>(skeleton.bones);
-      // console.log(skeleton.bones, clip)
-      // let rootBone
-      // for (const bone of skeleton.bones) {
-      //   if (bone.parent == null || !boneSet.has(bone.parent)) {
-      //     console.log(bone)
-      //     // return bone;
-      //     rootBone = bone
-      //   }
-      // }
-      // rootBone.updateWorldMatrix(false, true);
-      // Create a SkeletonHelper to visualize the skeleton
+      // console.log('bvh skeleton.bones', JSON.stringify(skeleton.bones))
+      convertWrapper('output.bvh', result)
+
       const skeletonHelper = new THREE.SkeletonHelper(skeleton.bones[0]);
       setSk(skeleton.bones[0])
       skeletonHelper.skeleton = skeleton;
       skeletonHelper.visible = true; // Ensure helper is visible
       skeletonHelper.scale.set(0.01, 0.01, 0.01); 
-      // skeletonHelper.material = new THREE.LineBasicMaterial({
-      //   // color: 0xff0000, // Change color to red or any color you prefer
-      //   linewidth: 10 // Set line width (note: linewidth is ignored by some WebGL implementations)
-      // });
+
       setSkeletonHelper(skeletonHelper);
 
        // Create a basic mesh to visualize the bones
@@ -215,32 +199,7 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
 
 				};
         
-
-        // const options = {
-        //   fps: fps,
-        // };
-        // if (!fbx.skeleton) {
-        //   fbx.traverse((child) => {
-        //     if (child.skeleton) {
-        //       fbx.skeleton = child.skeleton;
-        //     }
-        //   });
-        // }
-
-        // SkeletonUtils.retarget(fbx, skeletonHelper, retargetOptions);
-        // const modelClip = SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, retargetOptions);
-        // // console.log('modelClip', fbx.skeleton, modelClip, clip)
-        // const newModelMixer = new THREE.AnimationMixer(fbx);
-        // newModelMixer.clipAction(modelClip).play();
-        // setModelMixer(newModelMixer);
       }
-
-      // SkeletonUtils.retargetClip(fbx, skeletonHelper, clip, {});
-      // console.log('after retarget', fbx)
-      // Create an AnimationMixer for animating the skeleton
-      // const newMixer = new THREE.AnimationMixer(skeleton.bones[0]);
-      // newMixer.clipAction(clip).play();
-      // setMixer(newMixer);
     });
 
     
@@ -274,6 +233,7 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
             if (blobURL) {
               const VRMAnimation = await loadVRMAnimation(blobURL);
               console.log(vrm.userData.vrm)
+              console.log('vrm11', vrm)
               setVrm(vrm.userData.vrm)
               const clip = createVRMAnimationClip(VRMAnimation!, vrm.userData.vrm);
               console.log(clip)
@@ -300,29 +260,6 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
 
 
 
-  // useEffect(() => {
-  //   if (mixamoModel && skeletonHelper) {
-  //     console.log('mixamoModel', mixamoModel)
-  //     // 克隆 Mixamo 模型
-  //     const targetModel = SkeletonUtils.clone(mixamoModel);
-
-  //     // 使用 SkeletonUtils 进行重定向
-  //     SkeletonUtils.retarget(targetModel, skeletonHelper);
-
-  //     // 添加重定向后的模型到场景
-  //     setMixamoModel(targetModel);
-  //   }
-  // }, [mixamoModel, skeletonHelper]);
-
-  // React.useEffect(() => {
-  //   const loader = new FBXLoader();
-  //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character.fbx', (fbx) => {
-  //     // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-  //     console.log(fbx)
-  //     setMixamoModel(fbx);
-  //   });
-  // }, []);
-
   useFrame((state, delta) => {
     if (vrmMixer) {
       // console.log('vrm update')
@@ -332,6 +269,15 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
     if (vrm) {
       // vrm.scene.rotation.y = Math.P; // 使模型面朝前
       vrm.update(delta)
+      blinkTimer += delta;
+
+      // 当计时器超过设定的眨眼间隔时触发眨眼
+      if (blinkTimer >= blinkInterval) {
+          setFaceExpression(vrm, 'blink', 1.0); // 设置眨眼的权重为1.0表示完全闭眼
+          blinkTimer = 0; // 重置计时器
+      } else if (blinkTimer >= 0.1) {
+          setFaceExpression(vrm, 'blink', 0); // 轻微延迟后打开眼睛，模拟眨眼的动作
+      }
     }
     // console.log(delta, 'delta')
     // if (mixer) mixer.update(delta);
@@ -347,21 +293,14 @@ const BVHAnimationCapture = ({ url, fbx }: {url: string, fbx: any}) => {
     {/* {fbx && <primitive object={fbx} />} */}
     {sk && <primitive object={sk} />}
     {/* {modelSk && <primitive object={modelSk} />} */}
-  {/* {skeletonHelper && (
+  {skeletonHelper && (
     <primitive object={skeletonHelper} />
-  )} */}
+  )}
  {/* {model.vrm && <primitive object={model.vrm?.scene} />} */}
  <group ref={modelRef} />
  {/* {vrm && <primitive object={vrm} />} */}
 </group>
 
-  // return skeleton ? (
-  //   <group position={[0, 0, 0]} ref={skeletonRef}>
-  //     {/* <mesh ref={skeletonRef} geometry={skeletonRef.current} material={new THREE.MeshBasicMaterial()} /> */}
-  //     <primitive object={skeleton} />
-  //   </group>
-    
-  // ) : null;
 };
 
 export default BVHAnimationCapture

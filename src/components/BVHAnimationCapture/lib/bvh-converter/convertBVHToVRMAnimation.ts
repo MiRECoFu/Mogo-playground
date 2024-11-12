@@ -29,12 +29,12 @@ export async function convertBVHToVRMAnimation(
 
   // find root bone of the skeleton
   const rootBone = getRootBone(skeleton);
-
+  console.log('rootBone', rootBone)
   // scale the entire tree by 0.01
   rootBone.traverse((bone) => {
     bone.position.multiplyScalar(scale);
   });
-  rootBone.updateWorldMatrix(false, true);
+  // rootBone.updateWorldMatrix(false, true);
 
   // create a map from vrm bone names to bones
   const vrmBoneMap = mapSkeletonToVRM(rootBone);
