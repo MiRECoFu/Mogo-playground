@@ -13,7 +13,7 @@ import { useLoader } from '@react-three/fiber'
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { Viewer } from '../BVHAnimationCapture/features/vrmViewer/viewer';
 // import AvatarSample_A from '@/assets/trump/trump.vrm';
-import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_A.vrm'
+import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_B.vrm'
 import { useAnimationFrame } from '@/utils/useAnimationFrame';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm";
@@ -34,6 +34,47 @@ export interface IExpression {
   expressionName: string
   weight: number
 }
+// 定义旋转限制的度数到弧度的转换
+const degToRad = THREE.MathUtils.degToRad;
+
+// 定义关节名称和旋转限制的范围
+type RotationLimits = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
+};
+
+// 定义所有关节的旋转限制
+const rotationLimits: Record<string, RotationLimits> = {
+  neck: { minX: -30, maxX: 30, minY: -60, maxY: 60, minZ: -20, maxZ: 20 },
+  shoulderL: { minX: -90, maxX: 90, minY: -90, maxY: 90, minZ: -90, maxZ: 90 },
+  shoulderR: { minX: -60, maxX: 60, minY: -20, maxY: 20, minZ: -90, maxZ: 90 },
+  elbowL: { minX: -150, maxX: 0, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+  elbowR: { minX: -150, maxX: 0, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+  wristL: { minX: -60, maxX: 60, minY: -30, maxY: 30, minZ: 0, maxZ: 0 },
+  wristR: { minX: -60, maxX: 60, minY: -30, maxY: 30, minZ: 0, maxZ: 0 },
+  hip: { minX: -30, maxX: 60, minY: -45, maxY: 45, minZ: -20, maxZ: 20 },
+  kneeL: { minX: 0, maxX: 150, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+  kneeR: { minX: 0, maxX: 150, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+  ankleL: { minX: -30, maxX: 45, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+  ankleR: { minX: -30, maxX: 45, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
+};
+
+// 定义骨骼对象的类型
+type Bone = THREE.Object3D | null;
+
+// 旋转限制函数，应用到每个关节
+function clampRotation(bone: Bone, limits: RotationLimits): void {
+  if (bone) {
+    bone.rotation.x = THREE.MathUtils.clamp(bone.rotation.x, degToRad(limits.minX), degToRad(limits.maxX));
+    bone.rotation.y = THREE.MathUtils.clamp(bone.rotation.y, degToRad(limits.minY), degToRad(limits.maxY));
+    bone.rotation.z = THREE.MathUtils.clamp(bone.rotation.z, degToRad(limits.minZ), degToRad(limits.maxZ));
+  }
+}
+
 const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, expressions: IExpression[]}) => {
   const skeletonRef = useRef();
   const [model] = useState<Model>(new Model());
@@ -229,16 +270,14 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
         async (vrm) => {
           if (modelRef.current) {
             modelRef.current.clear()
-            
+            // console.log(vrm, 'vvrrmm')
             if (blobURL) {
               const VRMAnimation = await loadVRMAnimation(blobURL);
               setVrm(vrm.userData.vrm)
               const clip = createVRMAnimationClip(VRMAnimation!, vrm.userData.vrm);
-              console.log(clip)
+
               vrm.userData.vrm.scene.name = 'VRMRoot';
-              if (!modelRef.current) {
-                
-              }
+
               modelRef.current.add(vrm.scene);
               VRMUtils.rotateVRM0(vrm.userData.vrm);
               const vrmMixer = new THREE.AnimationMixer(vrm.userData.vrm.scene)
@@ -266,7 +305,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
     }
     if (vrm) {
       // vrm.scene.rotation.y = Math.P; // 使模型面朝前
-      vrm.update(delta)
+      
       blinkTimer += delta;
 
       // 当计时器超过设定的眨眼间隔时触发眨眼
@@ -276,6 +315,23 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
       } else if (blinkTimer >= 0.1) {
           setFaceExpression(vrm, 'blink', 0); // 轻微延迟后打开眼睛，模拟眨眼的动作
       }
+          // 获取并限制各个关节的旋转
+      // const { neck, leftShoulder, rightShoulder, leftUpperArm, rightUpperArm, leftLowerArm, rightLowerArm, leftHand, rightHand, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg, leftFoot, rightFoot } = vrm.humanoid.humanBones;
+
+      // clampRotation(neck!.node, rotationLimits.neck);
+      // clampRotation(leftShoulder!.node, rotationLimits.shoulderL);
+      // clampRotation(rightShoulder!.node, rotationLimits.shoulderR);
+      // clampRotation(leftUpperArm!.node, rotationLimits.elbowL);
+      // clampRotation(rightUpperArm!.node, rotationLimits.elbowR);
+      // clampRotation(leftLowerArm!.node, rotationLimits.wristL);
+      // clampRotation(rightLowerArm!.node, rotationLimits.wristR);
+      // clampRotation(leftUpperLeg!.node, rotationLimits.hip);
+      // clampRotation(rightUpperLeg!.node, rotationLimits.hip);
+      // clampRotation(leftLowerLeg!.node, rotationLimits.kneeL);
+      // clampRotation(rightLowerLeg!.node, rotationLimits.kneeR);
+      // clampRotation(leftFoot!.node, rotationLimits.ankleL);
+      // clampRotation(rightFoot!.node, rotationLimits.ankleR);
+      vrm.update(delta)
     }
     // console.log(delta, 'delta')
     // if (mixer) mixer.update(delta);

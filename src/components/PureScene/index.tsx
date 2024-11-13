@@ -20,6 +20,8 @@ import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
 import { enhancePrompt, expressionPrompt } from "@/constant/LLM";
 import BVHAnimationSingle, { IExpression } from "../BVHAnimationSingle";
+import { Level, Sudo, Camera, Cactus, Box } from './Scene'
+
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
 // import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
 
@@ -56,7 +58,7 @@ const Scene = () => {
     const [prompt, setPrompt] = useState<string>('')
     const [length, setLength] = useState<number>(196)
     const [disabled, setDisabled] = useState<boolean>(false)
-    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/run-on-trendmill.bvh')
+    const [motionUrl, setMotionUrl] = useState<string>('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/6mlW/output.bvh')
     const [fbxModel, setFbxModel] = useState<any>()
     const [fbxModel2, setFbxModel2] = useState<any>()
     const [fbxModel3, setFbxModel3] = useState<any>()
@@ -254,7 +256,7 @@ const Scene = () => {
           {useLLM && enhancedP && <p className={styles.enhancedP}>After Enhanced: {enhancedP}</p>}
         </div>
         
-        <Canvas camera={{ position: [0, 2, 6] }}>
+        <Canvas camera={{ position: [0, 0.4, 1.5] }}>
         
           {/* 黑色背景 */}
           <color attach="background" args={["#f5f5f5"]} />
@@ -265,6 +267,13 @@ const Scene = () => {
 
           </directionalLight>
           <hemisphereLight intensity={1} groundColor="white" />
+          <group scale={2} position={[0, -1.25, -1]}>
+          <Level />
+          <Sudo />
+          <Camera />
+          <Cactus />
+          <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
+        </group>
           {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
           {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
           {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
