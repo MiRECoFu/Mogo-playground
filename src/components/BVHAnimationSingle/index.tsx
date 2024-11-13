@@ -169,11 +169,16 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
     loader.load(url,  async (result) => {
       const { skeleton, clip } = result;
       // const boneSet = new Set<THREE.Object3D>(skeleton.bones);
-      // console.log('bvh skeleton.bones', JSON.stringify(skeleton.bones))
+      console.log('bvh skeleton.bones', skeleton.bones)
       convertWrapper('output.bvh', result)
+      skeleton.bones[0].traverse((object: THREE.Object3D) => {
+        if (object.type == 'Bone') {
+          (object as THREE.Bone).rotation.order = 'ZYX';
+        }
+      });
 
       const skeletonHelper = new THREE.SkeletonHelper(skeleton.bones[0]);
-      setSk(skeleton.bones[0])
+      // setSk(skeleton.bones[0])
       skeletonHelper.skeleton = skeleton;
       skeletonHelper.visible = true; // Ensure helper is visible
       skeletonHelper.scale.set(0.01, 0.01, 0.01); 
@@ -277,8 +282,14 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
               const clip = createVRMAnimationClip(VRMAnimation!, vrm.userData.vrm);
 
               vrm.userData.vrm.scene.name = 'VRMRoot';
-
+              // vrm.scene.traverse((object) => {
+              //   if (object.type=='Bone') {
+              //     // console.log(object)
+              //     (object as THREE.Bone).rotation.order = 'ZYX';
+              //   }
+              // });
               modelRef.current.add(vrm.scene);
+              
               VRMUtils.rotateVRM0(vrm.userData.vrm);
               const vrmMixer = new THREE.AnimationMixer(vrm.userData.vrm.scene)
               vrmMixer.clipAction(clip).play()
