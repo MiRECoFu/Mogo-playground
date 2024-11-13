@@ -12,18 +12,21 @@ import { Button, Input, InputNumber, ConfigProvider, Space, message, Checkbox } 
 // import { Button, ConfigProvider, Space } from 'antd';
 import { createStyles } from 'antd-style';
 import styles from './style.less';
+import './style.less';
 import axios from "axios";
 import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing'
 import { Physics, useCompoundBody, usePlane } from "@react-three/cannon";
 import { Lamp } from "../Lamp";
 import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
-import { enhancePrompt, expressionPrompt } from "@/constant/LLM";
+import { enhancePrompt, expressionPrompt, virtualGFMotionPrompt, virtualGirlFriendPrompt } from "@/constant/LLM";
 import BVHAnimationSingle, { IExpression } from "../BVHAnimationSingle";
 import { Level, Sudo, Camera, Cactus, Box } from './Scene'
 
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
 // import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
+const apiKey = 'e5329e49d5d39274649923e8849b7e6c.fKUBmYEH7kQGfkJM'; // 替换为你的 API Key
+const url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
@@ -52,6 +55,10 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
 }));
 
 
+interface IChat {
+  character: string,
+  content: string
+}
 
 // 
 const Scene = () => {
@@ -69,81 +76,22 @@ const Scene = () => {
     const [enhancedP, setEnhancedP] = useState<string>('')
     const cameraControlsRef = useRef()
     const [expressionList, setExpressionList] = useState<IExpression[]>([])
+    const [chatList, setChatList] = useState<IChat[]>([{
+      character: 'girl',
+      content: '小弟弟，你来找我干什么~'
+    }])
+
+    const [userMsgInput, setUserMsgInput] = useState<string>('')
 
      // 加载 Mixamo FBX 模型
     useEffect(() => {
-      // const loader = new FBXLoader();
-      // const textureLoader = new THREE.TextureLoader();
-      // loader.load(TrumpModel, (fbx) => {
-      //   fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-      //   fbx.position.set(1, 0, 0); // 横向平移20单位
-      //   fbx.traverse((node) => {
-      //     if (node.isMesh) {
-      //         // 手动加载并应用纹理
-      //         node.material.map = textureLoader.load(trumpTexture);
-      //         node.material.needsUpdate = true;
-      //     }
-      //     console.log(node)
-      //     // if (node.isBone && node.name =="BipTrump") {
-      //     //   console.log('adsfdasfas')
-      //     //   node.rotation.set(0, 0, 0)
-      //     // }
-      // });
-        
-      //   // fbx.rotation.set(90, 0, 0)
-      //   // fbx.rotation.x = -Math.PI / 2;
-
-      //   setFbxModel(fbx);
-      // });
-      // const loader = new GLTFLoader();
-      // loader.setResourcePath('src/assets/trump/donald_t/')
-      // loader.load(TrumpModel, (gltf) => {
-      //   gltf.scene.scale.set(0.1, 0.1, 0.1); // Adjust the scale as needed
-      //   gltf.scene.position.set(1, 0, 0); 
-      //   const fbxLoader = new FBXLoader();
-      //   fbxLoader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/character%20%282%29.fbx', (fbx) => {
-      //         // fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-      //         // fbx.position.set(1, 0, 0); // 横向平移20单位
-      
-              
-      //         gltf.scene.traverse((node) => {
-      //           if (node.type === 'Bone') {
-                  
-      //             node.name = node.name.split('_')[0]
-      //             node.rotation.set(0, 0, 0)
-      //             console.log(node)
-      //             fbx.traverse((fn) => {
-      //               if (fn.type === 'Bone' && fn.name == node.name) {
-      //                 console.log(fn.name, fn.rotation.x - node.rotation.x, fn.rotation.y - node.rotation.y, fn.rotation.z - node.rotation.z)
-      //                 node.rotation.set(fn.rotation.x, fn.rotation.y, fn.rotation.z)
-      //               }
-      //             })
-      //           }
-      //         })
-      //         console.log(gltf.scene)
-      //         setFbxModel(gltf.scene);
-      //       });
-        
-      // });
-    //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
-    //     fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-    //     fbx2.position.set(-1, 0, 0); // 横向平移20单位
-
-    //     setFbxModel2(fbx2);
-    //   });
-    //   loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maria%20WProp%20J%20J%20Ong.fbx', (fbx3) => {
-    //     fbx3.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
-    //     fbx3.position.set(-2, 0, 0); // 横向平移20单位
-
-    //     setFbxModel3(fbx3);
-    //   });
+ 
     }, []);
     const genMotions = async () => {
       setDisabled(true)
       setEnhancedP('')
       let finalP = prompt
-      const apiKey = 'e5329e49d5d39274649923e8849b7e6c.fKUBmYEH7kQGfkJM'; // 替换为你的 API Key
-      const url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+    
       if (useLLM) {
         
         
@@ -196,7 +144,6 @@ const Scene = () => {
     })
     console.log(res.data.choices[0].message.content)
     const finalE = res.data.choices[0].message.content
-    console.log('finalE', finalE)
     const jsonStr = finalE.split('```json')[1].split('```')[0]
     try {
       console.log(jsonStr)
@@ -223,6 +170,116 @@ const Scene = () => {
       }
       
     }
+
+    const handleSendMsg = async () => {
+      setDisabled(true)
+      const userInput = userMsgInput
+      setChatList([...chatList, {
+        character: 'boy',
+        content: userMsgInput
+      }])
+      setUserMsgInput('')
+      const chatData = {
+        model: "glm-4-plus",
+        messages: [
+          {
+            "role": "system",
+            "content": `${virtualGirlFriendPrompt}, 你们现在有历史对话${chatList.map((chat) => chat.character + ':' + chat.content + '\n')}`
+          },
+          {
+              "role": "user",
+              "content": userInput
+  
+          }
+        ]
+      };
+
+    const res = await axios.post(url, chatData, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        }
+    })
+    const girlRes = res.data.choices[0].message.content
+    console.log(girlRes)
+   
+    const genMotionData = {
+      model: "glm-4-plus",
+      messages: [
+        {
+          "role": "system",
+          "content": `${virtualGFMotionPrompt}`
+        },
+        {
+            "role": "user",
+            "content": `boy: ${userInput}\n girl: ${girlRes}`
+
+        }
+      ]
+    };
+    const motionPromptRes = await axios.post(url, genMotionData, {
+      headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+      }
+    })
+    const motionPrompt = motionPromptRes.data.choices[0].message.content
+    try {
+      const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
+        prompt: motionPrompt,
+        length, 
+    }, {
+      timeout: 300000
+    });
+    setDisabled(false)
+    console.log(response)
+    setMotionUrl(response.data.oss_url)
+    } catch (error) {
+      setDisabled(false)
+      message.error('出错了，请重试')
+    }
+    const data = {
+      model: "glm-4-plus",
+      messages: [
+        {
+          "role": "system",
+          "content": expressionPrompt
+        },
+        {
+            "role": "user",
+            "content": motionPrompt
+
+        }
+      ]
+  };
+    const expression = await axios.post(url, data, {
+      headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+      }
+  })
+  console.log(expression.data.choices[0].message.content)
+  const finalE = expression.data.choices[0].message.content
+  const jsonStr = finalE.split('```json')[1].split('```')[0]
+  try {
+    console.log(jsonStr)
+    const exp = JSON.parse(jsonStr)
+    setExpressionList(exp)
+  } catch (error) {
+    console.error(error)
+  }
+    setChatList([
+      ...chatList,
+      {
+        character: 'boy',
+        content: userInput
+      },
+      {
+        character: 'girl',
+        content: girlRes
+      }
+    ])
+  }
     return (
       <>
         <div  className={styles.actionsWrapper}>
@@ -254,6 +311,40 @@ const Scene = () => {
             }} type='link'>控制输入框是否隐藏</Button>
           </Checkbox>
           {useLLM && enhancedP && <p className={styles.enhancedP}>After Enhanced: {enhancedP}</p>}
+        </div>
+
+        <div className={styles.chat}>
+            <div className={styles.chatHis}>
+              {
+                chatList.map((msg) => {
+                  if (msg.character === 'girl') {
+                    return (
+                      <div key={msg.content} className='message message-girl'>
+                        {msg.content}
+                      </div>
+                    )
+                  } else {
+                    return (
+                      <div key={msg.content} className={'message message-boy'}>
+                        {msg.content}
+                      </div>
+                    )
+                  }
+                })
+              }
+            </div>
+            <div className={styles.chatInput}>
+                <Input.TextArea
+                  value={userMsgInput}
+                  onChange={(e) => {
+                    setUserMsgInput(e.target.value)
+                  }}
+                  disabled={disabled}
+                  onPressEnter={() => {
+                    handleSendMsg()
+                  }}
+                />
+            </div>
         </div>
         
         <Canvas camera={{ position: [0, 0.4, 1.5] }}>

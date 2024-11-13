@@ -17,10 +17,56 @@
     left: 50%;
     // background-color: #303134;
     transform: translateX(-50%);
+    display: none;
 }
 
 .enhancedP {
     font-size: 12px;
     font-weight: normal;
     color: #000;
+}
+
+.chat {
+    width: 300px;
+    height: calc(100vh - 80px);
+    position: fixed;
+    top: 70px;
+    right: 60px;
+    border-radius: 20px;
+    background-color: rgba(0,0,0,.3);
+    z-index: 9999;
+    padding: 12px;
+    font-style: normal;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 12px;
+}
+.chatHis {
+    height: 90%;
+}
+.chatInput {
+    flex: 1;
+    width: 100%;
+}
+.message {
+    width: 100%;
+    height: auto;
+    padding: 8px;
+    box-sizing: border-box;
+    font-weight: normal;
+    font-size: 12px;
+    border-radius: 16px;
+    margin-bottom: 8px;
+    &-girl {
+        background: linear-gradient(to right, #fbc2eb 0%, #a6c1ee 100%);
+        color: #fff;
+    }
+
+    &-boy {
+        background-color: #fff;
+        color: #111;
+    }
 }
