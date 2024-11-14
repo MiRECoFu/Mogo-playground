@@ -340,11 +340,22 @@ const Scene = () => {
             <div className={styles.chatInput}>
                 <Input.TextArea
                   value={userMsgInput}
+                  onBlur={() => {
+                    document.body.requestPointerLock(); // 重新请求 Pointer Lock
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      document.body.requestPointerLock();
+                      e.target.blur(); // 输入完成后让输入框失去焦点
+                    }
+                  }}
                   onChange={(e) => {
+                    // e.stopPropagation()
                     setUserMsgInput(e.target.value)
                   }}
                   disabled={disabled}
-                  onPressEnter={() => {
+                  onPressEnter={(e) => {
+                    e.stopPropagation()
                     handleSendMsg()
                   }}
                 />
@@ -358,7 +369,7 @@ const Scene = () => {
             { name: "right", keys: ["ArrowRight", "d", "D"] },
             { name: "jump", keys: ["Space"] },
         ]}>
-            <Canvas camera={{ position: [0, 0.4, 1.5] }}>
+            <Canvas camera={{ fov: 45 }}>
             
               {/* 黑色背景 */}
               <color attach="background" args={["#f5f5f5"]} />
@@ -371,12 +382,12 @@ const Scene = () => {
               </directionalLight>
               <hemisphereLight intensity={1} groundColor="white" />
               <group scale={2} position={[0, -1.25, -1]}>
-              <Level />
-              <Sudo />
-              <Camera />
-              <Cactus />
-              <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
-            </group>
+                <Level />
+                <Sudo />
+                <Camera />
+                <Cactus />
+                <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
+              </group>
               {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
               {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
               {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
@@ -395,7 +406,7 @@ const Scene = () => {
               </Physics>
               {/* <OrbitControls /> */}
               <PointerLockControls />
-              {fbxModel && <CameraControls ref={cameraControlsRef} />}
+              {/* {fbxModel && <CameraControls ref={cameraControlsRef} />} */}
             </Canvas>
         </KeyboardControls>
       </>
