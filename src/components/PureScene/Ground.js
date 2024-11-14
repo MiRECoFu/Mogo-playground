@@ -19,7 +19,7 @@ export function Ground(props) {
             depthScale={1.2}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
-            color="#202020"
+            color="#ccc"
             metalness={0.8}
           />
       </mesh>
