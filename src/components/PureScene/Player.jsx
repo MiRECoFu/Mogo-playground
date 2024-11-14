@@ -18,7 +18,6 @@ export function Player({ lerp = THREE.MathUtils.lerp }) {
   const [, get] = useKeyboardControls()
   useFrame((state) => {
     const { forward, backward, left, right, jump } = get()
-    console.log(get(), state.camera.position)
     const velocity = ref.current.linvel()
     // update camera
     const position = ref.current.translation();
