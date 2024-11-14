@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { AccumulativeShadows, CameraControls, MeshReflectorMaterial, OrbitControls, RandomizedLight, useAnimations } from "@react-three/drei";
+import { AccumulativeShadows, CameraControls, MeshReflectorMaterial, OrbitControls, RandomizedLight, KeyboardControls,Sky, PointerLockControls } from "@react-three/drei";
 import * as THREE from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -15,13 +15,17 @@ import styles from './style.less';
 import './style.less';
 import axios from "axios";
 import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing'
-import { Physics, useCompoundBody, usePlane } from "@react-three/cannon";
+import { useCompoundBody, usePlane } from "@react-three/cannon";
 import { Lamp } from "../Lamp";
 import { Cursor, useDragConstraint } from "../helpers/Drag";
 import { Block } from '../helpers/Block'
 import { enhancePrompt, expressionPrompt, virtualGFMotionPrompt, virtualGirlFriendPrompt } from "@/constant/LLM";
 import BVHAnimationSingle, { IExpression } from "../BVHAnimationSingle";
 import { Level, Sudo, Camera, Cactus, Box } from './Scene'
+import { Physics } from "@react-three/rapier"
+import { Ground } from "./Ground"
+import { Player } from "./Player"
+// import { Cube, Cubes } from "./Cube"
 
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
 // import trumpTexture from '@/assets/trump/lowpoly-trump-free-character/textures/tumpLPcolors.png'
@@ -346,47 +350,54 @@ const Scene = () => {
                 />
             </div>
         </div>
+        <KeyboardControls
+          map={[
+            { name: "forward", keys: ["ArrowUp", "w", "W"] },
+            { name: "backward", keys: ["ArrowDown", "s", "S"] },
+            { name: "left", keys: ["ArrowLeft", "a", "A"] },
+            { name: "right", keys: ["ArrowRight", "d", "D"] },
+            { name: "jump", keys: ["Space"] },
+        ]}>
+            <Canvas camera={{ position: [0, 0.4, 1.5] }}>
+            
+              {/* 黑色背景 */}
+              <color attach="background" args={["#f5f5f5"]} />
         
-        <Canvas camera={{ position: [0, 0.4, 1.5] }}>
-        
-          {/* 黑色背景 */}
-          <color attach="background" args={["#f5f5f5"]} />
-    
-          {/* 光源 */}
-          <ambientLight intensity={1} />
-          <directionalLight position={[-10, 10, 5]} intensity={0.5} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
+              {/* 光源 */}
+              <Sky sunPosition={[100, 20, 100]} />
+              <ambientLight intensity={1} />
+              <directionalLight position={[-10, 10, 5]} intensity={0.5} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
 
-          </directionalLight>
-          <hemisphereLight intensity={1} groundColor="white" />
-          <group scale={2} position={[0, -1.25, -1]}>
-          <Level />
-          <Sudo />
-          <Camera />
-          <Cactus />
-          <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
-        </group>
-          {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
-          {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
-          {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
-          {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
-          {/* Main scene */}
-          {/* <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
-            <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
-          </AccumulativeShadows>
-           */}
-          {/* BVH 动画 */}
-          <BVHAnimationSingle url={motionUrl} fbx={fbxModel} expressions={expressionList} />
-          {/* <Floor position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
-          {/* <sphereGeometry args={[1, 32]} /> */}
-          {/* 控制器 */}
-          <OrbitControls />
-          {fbxModel && <CameraControls ref={cameraControlsRef} />}
-
-          {/* <EffectComposer disableNormalPass>
-        <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={2} />
-        <DepthOfField target={[0, 0, 13]} focalLength={0.3} bokehScale={15} height={700} />
-      </EffectComposer> */}
-        </Canvas>
+              </directionalLight>
+              <hemisphereLight intensity={1} groundColor="white" />
+              <group scale={2} position={[0, -1.25, -1]}>
+              <Level />
+              <Sudo />
+              <Camera />
+              <Cactus />
+              <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
+            </group>
+              {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
+              {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
+              {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
+              {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
+              {/* Main scene */}
+              {/* <AccumulativeShadows temporal frames={Infinity} alphaTest={1} blend={200} limit={1500} scale={25} position={[0, -0.05, 0]}>
+                <RandomizedLight amount={1} mapSize={512} radius={5} ambient={0.5} position={[-10, 10, 5]} size={10} bias={0.001} />
+              </AccumulativeShadows>
+              */}
+              {/* BVH 动画 */}
+              <BVHAnimationSingle url={motionUrl} fbx={fbxModel} expressions={expressionList} />
+              <Physics gravity={[0, -30, 0]}>
+                <Ground position={[0, -1.2, 0]} />
+                <Player />
+                
+              </Physics>
+              {/* <OrbitControls /> */}
+              <PointerLockControls />
+              {fbxModel && <CameraControls ref={cameraControlsRef} />}
+            </Canvas>
+        </KeyboardControls>
       </>
       
     );

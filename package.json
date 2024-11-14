@@ -9,12 +9,14 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.14.0",
     "@pixiv/three-vrm": "^3.1.4",
     "@pixiv/three-vrm-animation": "^3.1.4",
     "@react-three/cannon": "^6.6.0",
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.7",
     "@react-three/postprocessing": "^2.16.2",
+    "@react-three/rapier": "^1.5.0",
     "@react-three/uikit": "^0.5.4",
     "@react-three/uikit-apfel": "^0.5.4",
     "antd": "^5.20.6",
