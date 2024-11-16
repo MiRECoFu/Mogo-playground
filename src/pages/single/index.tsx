@@ -17,9 +17,9 @@ const SingleScene = () => {
           // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
         }}
         >
-          <div style={{ height: "100vh" }}>
-          <PureScene />
-        </div>
+          <div style={{ height: "100%" }}>
+            <PureScene />
+          </div>
         </ConfigProvider>
     );
   };

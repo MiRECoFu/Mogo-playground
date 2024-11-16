@@ -14,11 +14,6 @@ import { createStyles } from 'antd-style';
 import styles from './style.less';
 import './style.less';
 import axios from "axios";
-import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing'
-import { useCompoundBody, usePlane } from "@react-three/cannon";
-import { Lamp } from "../Lamp";
-import { Cursor, useDragConstraint } from "../helpers/Drag";
-import { Block } from '../helpers/Block'
 import { enhancePrompt, expressionPrompt, virtualGFMotionPrompt, virtualGirlFriendPrompt } from "@/constant/LLM";
 import BVHAnimationSingle, { IExpression } from "../BVHAnimationSingle";
 import { Level, Sudo, Camera, Cactus, Box } from './Scene'
@@ -350,7 +345,7 @@ const Scene = () => {
                     }
                   }}
                   onChange={(e) => {
-                    // e.stopPropagation()
+                    e.stopPropagation()
                     setUserMsgInput(e.target.value)
                   }}
                   disabled={disabled}
@@ -363,10 +358,10 @@ const Scene = () => {
         </div>
         <KeyboardControls
           map={[
-            { name: "forward", keys: ["ArrowUp", "w", "W"] },
-            { name: "backward", keys: ["ArrowDown", "s", "S"] },
-            { name: "left", keys: ["ArrowLeft", "a", "A"] },
-            { name: "right", keys: ["ArrowRight", "d", "D"] },
+            { name: "forward", keys: ["ArrowUp"] },
+            { name: "backward", keys: ["ArrowDown"] },
+            { name: "left", keys: ["ArrowLeft"] },
+            { name: "right", keys: ["ArrowRight"] },
             { name: "jump", keys: ["Space"] },
         ]}>
             <Canvas camera={{ fov: 45 }}>
@@ -381,7 +376,7 @@ const Scene = () => {
 
               </directionalLight>
               <hemisphereLight intensity={1} groundColor="white" />
-              <group scale={2} position={[0, -1.25, -1]}>
+              <group scale={2} position={[0, -1.25, -1]} rotation={[0, -0.5, 0]}>
                 <Level />
                 <Sudo />
                 <Camera />
