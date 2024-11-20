@@ -12,7 +12,7 @@ import { useLoader } from '@react-three/fiber'
 // const bvh = require('/Users/fudongjie/text2motion/Mogo-playground/src/assets/run-on-trendmill.bvh')
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { Viewer } from './features/vrmViewer/viewer';
-import AvatarSample_A from './AvatarSample_A.vrm';
+import AvatarSample_A from './sexygirl.vrm';
 import { useAnimationFrame } from '@/utils/useAnimationFrame';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm";
