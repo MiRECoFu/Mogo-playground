@@ -194,7 +194,12 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
               vrm.userData.vrm.scene.name = 'VRMRoot';
 
               modelRef.current.add(vrm.scene);
-              
+              console.log(vrm.userData.vrm)
+              const humanoidBones = vrm.userData.vrm.humanoid.humanBones
+
+              Object.values(humanoidBones).forEach((bone) => {
+                bone.node.rotation.order = 'ZYX'; // 根据你的需要设置旋转顺序
+              });
               VRMUtils.rotateVRM0(vrm.userData.vrm);
               const vrmMixer = new THREE.AnimationMixer(vrm.userData.vrm.scene)
               vrmMixer.clipAction(clip).play()
