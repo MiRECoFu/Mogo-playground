@@ -178,13 +178,25 @@ const Scene = () => {
         content: userMsgInput
       }])
       setUserMsgInput('')
+      const msgHis = chatList.map((m) => ({
+        "role": m.character === "boy" ? "user" : "assistant",
+        "content": m.content
+      }))
       const chatData = {
         model: "glm-4-plus",
+        // model: "charglm-3",
+      //   meta: {
+      //     "user_info": "我是陆星辰，是一个男性",
+      //     "bot_info": virtualGirlFriendPrompt,
+      //     "bot_name": "苏梦远",
+      //     "user_name": "陆星辰"
+      // },
         messages: [
           {
             "role": "system",
-            "content": `${virtualGirlFriendPrompt}, 你们现在有历史对话${chatList.map((chat) => chat.character + ':' + chat.content + '\n')}`
+            "content": `${virtualGirlFriendPrompt}`
           },
+          ...msgHis,
           {
               "role": "user",
               "content": userInput
@@ -204,6 +216,7 @@ const Scene = () => {
    
     const genMotionData = {
       model: "glm-4-plus",
+      temperature: 0.3,
       messages: [
         {
           "role": "system",
@@ -225,8 +238,8 @@ const Scene = () => {
     const motionPrompt = motionPromptRes.data.choices[0].message.content
     try {
       const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
-        prompt: motionPrompt,
-        length, 
+        prompt: motionPrompt.split('#')[0],
+        length: +(motionPrompt.split('#')[1] || 196),
     }, {
       timeout: 300000
     });

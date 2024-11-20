@@ -13,7 +13,8 @@ import { useLoader } from '@react-three/fiber'
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { Viewer } from '../BVHAnimationCapture/features/vrmViewer/viewer';
 // import AvatarSample_A from '@/assets/trump/trump.vrm';
-import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_B.vrm'
+// import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_B.vrm'
+import AvatarSample_A from '@/components/BVHAnimationCapture/sexygirl.vrm'
 import { useAnimationFrame } from '@/utils/useAnimationFrame';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm";
