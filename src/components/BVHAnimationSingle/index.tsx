@@ -221,13 +221,14 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
   useFrame((state, delta) => {
     
     if (vrm) {
+      vrm.update(delta)
       const lookAt = vrm.lookAt;
       // lookAt?.lookAt(state.camera.position)
       lookAt?.update(delta)
       const humanoidBones = vrm.humanoid.humanBones;
       const headBone = vrm.humanoid.getRawBoneNode("head");
       const neckBone = vrm.humanoid.getRawBoneNode("neck");
-
+      // console.log('nneckBone',neckBone)
       const smoothFactor = 0.1; // 平滑系数，值越小越平滑
       const rotationThreshold = Math.PI / 4; // 限制跳跃阈值
 
@@ -262,7 +263,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
         euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 6, Math.PI / 6); // 限制俯仰
         euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 6, Math.PI / 6); // 限制水平
         euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 4, Math.PI / 4); // 限制侧倾
-
+        // euler.order = 'ZYX'
         targetQuaternion.setFromEuler(euler);
 
         // 检测旋转跳跃并插值
@@ -272,29 +273,61 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
           neckBone.quaternion.copy(targetQuaternion);
         }
       }
-      Object.values(humanoidBones).forEach((bone) => {
-      if (bone.node && bone.node.name !== 'head' && bone.node.name !== 'neck') {
+      Object.keys(humanoidBones).forEach((key) => {
+        const bone = humanoidBones[key]
+        // console.log(bone.node.name, key, '')
+        if (key === 'leftShoulder') {
+          bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+          bone.node.rotation.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+          bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 4, Math.PI / 9);
+        }
+        // if (key === 'leftUpperArm') {
+        //   // bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+        //   // bone.node.rotation.y += THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        //   bone.node.rotation.z += Math.PI / 9
+        // }
+        // if (key === 'leftForerArm') {
+        //   // bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+        //   // bone.node.rotation.y += THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        //   bone.node.rotation.z += Math.PI / 9
+        // }
+
+        if (key === 'rightShoulder') {
+          bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+          bone.node.rotation.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+          bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 9, Math.PI / 4);
+        }
+        // if (key === 'rightUpperArm') {
+        //   // bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+        //   // bone.node.rotation.y += THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        //   bone.node.rotation.z -= Math.PI / 9
+        // }
+        // if (key === 'rightForerArm') {
+        //   // bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 6, Math.PI / 6);
+        //   // bone.node.rotation.y += THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        //   bone.node.rotation.z -= Math.PI / 9
+        // }
+      // if (bone && key !== 'head' && key !== 'neck') {
         // 添加旋转角度限制 (以肩膀为例，可根据实际需求调整)
-        bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 4, Math.PI / 4);
-        bone.node.rotation.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
-        bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 6, Math.PI / 6);
+        // bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 4, Math.PI / 4);
+        // bone.node.rotation.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        // bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 6, Math.PI / 6);
 
         // 平滑骨骼旋转
-        const bodySmoothFactor = 0.1; // 平滑系数，越小越平滑
+        const bodySmoothFactor = 0.2; // 平滑系数，越小越平滑
         // bone.node.rotation.x += (bone.node.rotation.x - bone.node.rotation.x) * bodySmoothFactor;
         // bone.node.rotation.y += (bone.node.rotation.y - bone.node.rotation.y) * bodySmoothFactor;
         // bone.node.rotation.z += (bone.node.rotation.z - bone.node.rotation.z) * bodySmoothFactor;
         const currentQuaternion = bone.node.quaternion.clone();
         const targetQuaternion = currentQuaternion.clone();
-
-        // 限制旋转范围
         const euler = new THREE.Euler().setFromQuaternion(currentQuaternion);
-        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 6, Math.PI / 6); // 限制俯仰
-        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 4, Math.PI / 4); // 限制水平
-        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 8, Math.PI / 8); // 限制侧倾
+        // euler.order = 'ZYX'
+        // euler.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 2, Math.PI / 2);
+        // euler.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 2, Math.PI / 2);
+        // euler.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 2, Math.PI / 2);
         targetQuaternion.setFromEuler(euler)
         bone.node.quaternion.slerp(targetQuaternion, bodySmoothFactor);
-      }
+      // }
     });
       
       blinkTimer += delta;
@@ -307,7 +340,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
           setFaceExpression(vrm, 'blink', 0); // 轻微延迟后打开眼睛，模拟眨眼的动作
       }
 
-      vrm.update(delta)
+     
     }
 
     if (vrmMixer) {
