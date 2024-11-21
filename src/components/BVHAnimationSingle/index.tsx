@@ -259,9 +259,9 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
 
         // 限制旋转范围
         const euler = new THREE.Euler().setFromQuaternion(currentQuaternion);
-        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 4, Math.PI / 4); // 限制俯仰
-        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 3, Math.PI / 3); // 限制水平
-        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 2, Math.PI / 2); // 限制侧倾
+        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 6, Math.PI / 6); // 限制俯仰
+        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 6, Math.PI / 6); // 限制水平
+        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 4, Math.PI / 4); // 限制侧倾
 
         targetQuaternion.setFromEuler(euler);
 
