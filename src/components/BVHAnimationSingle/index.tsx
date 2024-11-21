@@ -219,15 +219,83 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
 
 
   useFrame((state, delta) => {
-    if (vrmMixer) {
-      // console.log('vrm update')
-      vrmMixer.update(delta)
-      
-    }
+    
     if (vrm) {
       const lookAt = vrm.lookAt;
       // lookAt?.lookAt(state.camera.position)
       lookAt?.update(delta)
+      const humanoidBones = vrm.humanoid.humanBones;
+      const headBone = vrm.humanoid.getRawBoneNode("head");
+      const neckBone = vrm.humanoid.getRawBoneNode("neck");
+
+      const smoothFactor = 0.1; // 平滑系数，值越小越平滑
+      const rotationThreshold = Math.PI / 4; // 限制跳跃阈值
+
+      // 平滑处理头部骨骼
+      if (headBone) {
+        const currentQuaternion = headBone.quaternion.clone();
+        const targetQuaternion = currentQuaternion.clone();
+
+        // 限制旋转范围
+        const euler = new THREE.Euler().setFromQuaternion(currentQuaternion);
+        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 6, Math.PI / 6); // 限制俯仰
+        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 4, Math.PI / 4); // 限制水平
+        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 8, Math.PI / 8); // 限制侧倾
+
+        targetQuaternion.setFromEuler(euler);
+
+        // 检测旋转跳跃并插值
+        if (currentQuaternion.angleTo(targetQuaternion) > rotationThreshold) {
+          headBone.quaternion.slerp(targetQuaternion, smoothFactor);
+        } else {
+          headBone.quaternion.copy(targetQuaternion);
+        }
+      }
+
+      // 平滑处理脖子骨骼
+      if (neckBone) {
+        const currentQuaternion = neckBone.quaternion.clone();
+        const targetQuaternion = currentQuaternion.clone();
+
+        // 限制旋转范围
+        const euler = new THREE.Euler().setFromQuaternion(currentQuaternion);
+        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 4, Math.PI / 4); // 限制俯仰
+        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 3, Math.PI / 3); // 限制水平
+        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 2, Math.PI / 2); // 限制侧倾
+
+        targetQuaternion.setFromEuler(euler);
+
+        // 检测旋转跳跃并插值
+        if (currentQuaternion.angleTo(targetQuaternion) > rotationThreshold) {
+          neckBone.quaternion.slerp(targetQuaternion, smoothFactor);
+        } else {
+          neckBone.quaternion.copy(targetQuaternion);
+        }
+      }
+      Object.values(humanoidBones).forEach((bone) => {
+      if (bone.node && bone.node.name !== 'head' && bone.node.name !== 'neck') {
+        // 添加旋转角度限制 (以肩膀为例，可根据实际需求调整)
+        bone.node.rotation.x = THREE.MathUtils.clamp(bone.node.rotation.x, -Math.PI / 4, Math.PI / 4);
+        bone.node.rotation.y = THREE.MathUtils.clamp(bone.node.rotation.y, -Math.PI / 6, Math.PI / 6);
+        bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 6, Math.PI / 6);
+
+        // 平滑骨骼旋转
+        const bodySmoothFactor = 0.1; // 平滑系数，越小越平滑
+        // bone.node.rotation.x += (bone.node.rotation.x - bone.node.rotation.x) * bodySmoothFactor;
+        // bone.node.rotation.y += (bone.node.rotation.y - bone.node.rotation.y) * bodySmoothFactor;
+        // bone.node.rotation.z += (bone.node.rotation.z - bone.node.rotation.z) * bodySmoothFactor;
+        const currentQuaternion = bone.node.quaternion.clone();
+        const targetQuaternion = currentQuaternion.clone();
+
+        // 限制旋转范围
+        const euler = new THREE.Euler().setFromQuaternion(currentQuaternion);
+        euler.x = THREE.MathUtils.clamp(euler.x, -Math.PI / 6, Math.PI / 6); // 限制俯仰
+        euler.y = THREE.MathUtils.clamp(euler.y, -Math.PI / 4, Math.PI / 4); // 限制水平
+        euler.z = THREE.MathUtils.clamp(euler.z, -Math.PI / 8, Math.PI / 8); // 限制侧倾
+        targetQuaternion.setFromEuler(euler)
+        bone.node.quaternion.slerp(targetQuaternion, bodySmoothFactor);
+      }
+    });
       
       blinkTimer += delta;
 
@@ -242,7 +310,11 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
       vrm.update(delta)
     }
 
-    
+    if (vrmMixer) {
+      // console.log('vrm update')
+      vrmMixer.update(delta)
+      
+    }
   });
   return <group position={[0, -1, 0]}>
     {/* {fbx && <primitive object={fbx} />} */}

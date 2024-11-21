@@ -396,6 +396,7 @@ const Scene = () => {
                 <Cactus />
                 <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
               </group>
+              
               {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
               {/* <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} /> */}
               {/* <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} /> */}
