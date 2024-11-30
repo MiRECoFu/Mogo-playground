@@ -13,15 +13,17 @@ This person kicks with his right leg then jabs several times.\n
 a person lifting both arms together in front of them and then lift them back down\n
 a man walks up and down from either stairs, rocks, or some unlevel terrain requiring a step.\n
 a person with dance moves\n
+weapon attack a man holding a Thrusting Sword,executing a Right-Handed,One-Handed,Light Attack,Fall Attack,root motion get Falling, Light-Weighted and Relative Fast.
 The character swings their fist to the right and stands up at a moderate pace from a crouched position with a slight stagger.
 The character swings their attack with their right hand without charging, firmly squatting and holding the weapon at their waist, and then strikes from left to right.
 The character uses a wedge to perform a basic movement, swiftly running forward with lightness. They start by kneeling on their left knee, with the left arm hanging down and the right hand placed to the side of the shoulder. After pushing off with their left foot, they rotate in the air to face backward, land with their right foot, and return to the running posture.
-注意：1.不要写具体的人物,动作主体均为 a man、a person.
+weapon attack a man holding a Claw,executing a Right-Handed,One-Handed,Charging,root motion get Forward, Steady,Charged,Accumulating strength and Cleanly,Relative Fast,which make a sense of Charging,Charged,Accumulating strength.
+注意：1.不要写具体的人物,动作主体均为 a man、a person.\n
+2.攻击类动作可以用 weapon  attack 开头。
 3.你的描述要尽可能的用词简单清晰，不要使用复杂词汇。
+
 4.尽可能模仿我上面给你的 prompt例子的用词方式描述。\n
 举例：
-input: a man rises from the ground, walks in a circle and sits back down on the ground.\n
-output: a man rises from the ground, walks in a circle and sits back down on the ground.\n
 
 input: 一个中世纪骑士在战斗\n
 output: A person stands firmly, raising a hand high, then lunges forward, swinging the sword from right to left while shifting weight onto his front foot.\n
@@ -32,11 +34,29 @@ output: a man walks in a figure 8 \n
 input: a man crawls forward \n
 output: a man crawls forward \n
 
-input: a person walks in a circle \n
-output: a person walks in a circle \n
-
 input: a man is battling \n
-output: a man is boxing
+output: a man is boxing\n
+
+input: 一个战士用双手锤用力一击 \n
+output: weapon attack a man holding a Great Hammer,executing a Two-Handed,Run Attack,Light Attack,root motion get Forward, Heavy-Weighted,Powerful and Relative Fast.\n
+
+input: 一个枪手单手快速射击\n
+output: weapon attack a man holding a Gun,executing a Right-Handed,One-Handed,Shoot,root motion get Forward, Straightforward,Light-Weighted and Uniform Speed,Cleanly.
+
+input: 一个人快速向右拔出武士刀挥砍\n
+output: 帮我翻译成中文：The character gracefully twists their waist to the right, sprints forward quickly, and firmly grips the knives with both hands. They swiftly swing the blades down towards the right.\n
+
+input: 重剑重攻击\n
+output: The character charges a heavy attack with a greatsword\n
+
+input: 角色使用细剑迅速进行双手刺击攻击，轻轻向左扭腰，右腿向前跨出一步，然后蓄力发招\n
+output: The character performs a swift double-armed thrust attack with a rapier. They lightly twist their waist to the left, take a step forward with their right leg, and then gather strength.\n
+
+input: 角色用右手持刺剑进行一次轻攻击，身体向右用力扭腰，右腿向前跨出一步，右手向前伸出，然后迅速站直身体。\n
+output: The character performs a light attack with a thrusting sword in their right hand. They firmly twist their waist to the right, take a step forward with their right leg, extend their right hand forward, and then stand up quickly.\n
+
+input: 角色左手持长矛，右手持巨斧，双持武器，用力将武器插入地面，然后缓慢恢复到正常站立姿势。\n
+output: The character holds a spear in their left hand and a greataxe in their right hand, dual-wielding the weapons. They firmly thrust the weapons into the ground and slowly return to the normal standing position.\n
 `
 
 export const expressionPrompt = `你现在是个人类表情专家，你需要根据一个动作描述，来输出这个动作需要的表情。表情列表如下：

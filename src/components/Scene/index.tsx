@@ -118,7 +118,7 @@ const Scene = () => {
         fbx.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
         fbx.position.set(1, 0, 0); // 横向平移20单位
 
-        setFbxModel(fbx);
+        setFbxModel3(fbx);
       });
       loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maw%20J%20Laygo.fbx', (fbx2) => {
         fbx2.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
@@ -126,11 +126,11 @@ const Scene = () => {
 
         setFbxModel2(fbx2);
       });
-      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Maria%20WProp%20J%20J%20Ong.fbx', (fbx3) => {
+      loader.load('https://mogo-bvh.oss-cn-beijing.aliyuncs.com/Paladin%20WProp%20J%20Nordstrom.fbx', (fbx3) => {
         fbx3.scale.set(0.01, 0.01, 0.01); // 根据需要缩放模型
         fbx3.position.set(-2, 0, 0); // 横向平移20单位
 
-        setFbxModel3(fbx3);
+        setFbxModel(fbx3);
       });
     }, []);
     const genMotions = async () => {
@@ -213,21 +213,21 @@ const Scene = () => {
         <Canvas camera={{ position: [0, 5, 5] }}>
         
           {/* 黑色背景 */}
-          <color attach="background" args={["#000000"]} />
+          <color attach="background" args={["#202030"]} />
     
           {/* 光源 */}
           <ambientLight />
-          <hemisphereLight intensity={0.7} groundColor="black" />
+          <hemisphereLight intensity={2} groundColor="#fff" />
           <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} />
-          <pointLight position={[2, 1, 0]} color="blue" intensity={1.5} />
-          <spotLight decay={0} position={[10, 20, 10]} angle={0.12} penumbra={1} intensity={1} castShadow shadow-mapSize={1024} />
+          <pointLight position={[2, 1, 0]} color="white" intensity={2.5} />
+          <spotLight decay={0} position={[2, 20, 10]} angle={0.12} penumbra={1} intensity={2} castShadow shadow-mapSize={1024} />
           {/* <gridHelper args={[20, 20, 'red', 'gray']} /> */}
           {/* Main scene */}
       <group position={[-0, -1, 0]}>
         {/* Auto-instanced sketchfab model */}
-        <Instances>
+        {/* <Instances>
           <Computers scale={1.5} position={[0, 0, -10]} />
-        </Instances>
+        </Instances> */}
         {/* Auto-instanced sketchfab model */}
         
         {/* Plane reflections + distance blur */}
@@ -242,7 +242,7 @@ const Scene = () => {
             depthScale={1.2}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
-            color="#202020"
+            color="#202030"
             metalness={0.8}
           />
         </mesh>
@@ -266,10 +266,10 @@ const Scene = () => {
           {/* <sphereGeometry args={[1, 32]} /> */}
           {/* 控制器 */}
           <OrbitControls />
-          <EffectComposer disableNormalPass>
-        <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={2} />
+          {/* <EffectComposer disableNormalPass>
+        <Bloom luminanceThreshold={0} mipmapBlur luminanceSmoothing={0.0} intensity={0.4} />
         <DepthOfField target={[0, 0, 13]} focalLength={0.3} bokehScale={15} height={700} />
-      </EffectComposer>
+      </EffectComposer> */}
         </Canvas>
       </>
       
