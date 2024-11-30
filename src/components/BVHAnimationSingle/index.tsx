@@ -14,7 +14,7 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { Viewer } from '../BVHAnimationCapture/features/vrmViewer/viewer';
 // import AvatarSample_A from '@/assets/trump/trump.vrm';
 // import AvatarSample_A from '@/components/BVHAnimationCapture/AvatarSample_B.vrm'
-import AvatarSample_A from '@/components/BVHAnimationCapture/sexygirl.vrm'
+import AvatarSample_A from '@/components/BVHAnimationCapture/jinx.vrm'
 import { useAnimationFrame } from '@/utils/useAnimationFrame';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm";
@@ -314,7 +314,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
         // bone.node.rotation.z = THREE.MathUtils.clamp(bone.node.rotation.z, -Math.PI / 6, Math.PI / 6);
 
         // 平滑骨骼旋转
-        const bodySmoothFactor = 0.2; // 平滑系数，越小越平滑
+        const bodySmoothFactor = 0.1; // 平滑系数，越小越平滑
         // bone.node.rotation.x += (bone.node.rotation.x - bone.node.rotation.x) * bodySmoothFactor;
         // bone.node.rotation.y += (bone.node.rotation.y - bone.node.rotation.y) * bodySmoothFactor;
         // bone.node.rotation.z += (bone.node.rotation.z - bone.node.rotation.z) * bodySmoothFactor;
@@ -349,7 +349,7 @@ const BVHAnimationCapture = ({ url, fbx, expressions }: {url: string, fbx: any, 
       
     }
   });
-  return <group position={[0, -1, 0]}>
+  return <group position={[0, -1.5, 0]}>
     {/* {fbx && <primitive object={fbx} />} */}
     {sk && <primitive object={sk} />}
     {/* {modelSk && <primitive object={modelSk} />} */}

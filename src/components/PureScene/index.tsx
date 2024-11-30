@@ -1,11 +1,11 @@
 
 import React, { useRef, useEffect, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { AccumulativeShadows, CameraControls, MeshReflectorMaterial, OrbitControls, RandomizedLight, KeyboardControls,Sky, PointerLockControls } from "@react-three/drei";
+import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
+import { AccumulativeShadows, CameraControls, MeshReflectorMaterial, OrbitControls, RandomizedLight, KeyboardControls,Sky, PointerLockControls, Effects, BakeShadows } from "@react-three/drei";
 import * as THREE from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+// import { UnrealBloomPass } from 'three-stdlib'
 import BVHAnimation from "../BVHAnimation";
 import { Instances, Computers } from '../Computers/Computers'
 import { Button, Input, InputNumber, ConfigProvider, Space, message, Checkbox } from "antd";
@@ -20,6 +20,10 @@ import { Level, Sudo, Camera, Cactus, Box } from './Scene'
 import { Physics } from "@react-three/rapier"
 import { Ground } from "./Ground"
 import { Player } from "./Player"
+import { Tower } from './Tower'
+import { UnrealBloomPass } from 'three-stdlib'
+
+extend({ UnrealBloomPass })
 // import { Cube, Cubes } from "./Cube"
 
 // import TrumpModel from '@/assets/trump/lowpoly-trump-free-character/source/trump_lp_anim_iddle01.fbx'
@@ -77,7 +81,7 @@ const Scene = () => {
     const [expressionList, setExpressionList] = useState<IExpression[]>([])
     const [chatList, setChatList] = useState<IChat[]>([{
       character: 'girl',
-      content: '小弟弟，你来找我干什么~'
+      content: '你怎么知道我在这里'
     }])
 
     const [userMsgInput, setUserMsgInput] = useState<string>('')
@@ -380,21 +384,30 @@ const Scene = () => {
             <Canvas camera={{ fov: 45 }}>
             
               {/* 黑色背景 */}
-              <color attach="background" args={["#f5f5f5"]} />
+              {/* <color attach="background" args={["#f5f5f5"]} /> */}
         
               {/* 光源 */}
-              <Sky sunPosition={[100, 20, 100]} />
-              <ambientLight intensity={1} />
+              {/* <Sky sunPosition={[100, 20, 100]} /> */}
+              {/* <ambientLight intensity={1} />
               <directionalLight position={[-10, 10, 5]} intensity={0.5} shadow-mapSize={[256, 256]} shadow-bias={-0.0001} castShadow>
 
               </directionalLight>
-              <hemisphereLight intensity={1} groundColor="white" />
-              <group scale={2} position={[0, -1.25, -1]} rotation={[0, -0.5, 0]}>
-                <Level />
+              <hemisphereLight intensity={1} groundColor="white" /> */}
+              <color attach="background" args={['#202030']} />
+              <fog attach="fog" args={['#202030', 10, 25]} />
+              <BakeShadows />
+              <hemisphereLight intensity={1} color="#eaeaea" groundColor="blue" />
+              <directionalLight castShadow intensity={0.4} shadow-mapSize={[1024, 1024]} shadow-bias={-0.0001} position={[10, 10, -10]} />
+              <Effects disableGamma>
+                <unrealBloomPass threshold={1} strength={0.3} radius={0.5} />
+              </Effects>
+              <group scale={2} position={[0, 3, -20]} rotation={[0, -1, 0]}>
+              <Tower position={[0, -2.25, 0]} />
+                {/* <Level />
                 <Sudo />
                 <Camera />
                 <Cactus />
-                <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} />
+                <Box position={[-0.8, 1.4, 0.4]} rotation={[0, 10, 0]} scale={0.15} /> */}
               </group>
               
               {/* {/* <pointLight position={[-2, 1, 0]} color="red" intensity={1.5} /> */}
@@ -409,7 +422,7 @@ const Scene = () => {
               {/* BVH 动画 */}
               <BVHAnimationSingle url={motionUrl} fbx={fbxModel} expressions={expressionList} />
               <Physics gravity={[0, -30, 0]}>
-                <Ground position={[0, -1.2, 0]} />
+                <Ground position={[0, -1.5, 0]} />
                 <Player />
                 
               </Physics>
