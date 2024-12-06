@@ -158,7 +158,7 @@ const Scene = () => {
     // setEnhancedP(finalP)
       
       try {
-        const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
+        const response = await axios.post('http://121.196.206.169:6006/generate_motion', {
           prompt: finalP,
           length
       }, {
@@ -241,7 +241,7 @@ const Scene = () => {
     })
     const motionPrompt = motionPromptRes.data.choices[0].message.content
     try {
-      const response = await axios.post('https://u213403-8cf6-b1722316.westb.seetacloud.com:8443/generate_motion', {
+      const response = await axios.post('http://121.196.206.169:6006/generate_motion', {
         prompt: motionPrompt.split('#')[0],
         length: +(motionPrompt.split('#')[1] || 196),
     }, {
