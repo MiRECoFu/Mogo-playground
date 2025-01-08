@@ -23,6 +23,8 @@ a person dance moon walk\n
 a man shoot a soccer ball with strong force towards the goal.\n
 A female ninja sneaks up behind an unsuspecting enemy and delivers a swift and deadly strike with her Katana.\n
 weapon attack a man holding a Shuriken,executing a Left-Handed,Switch Weapon,root motion get In-Place, Light-Weighted,Straightforward and Swift,Cleanly.\n
+The person is performing the Dragon Sword technique from Shaolin Kung Fu Wushu Da Mo Sword.\n
+The boy practices a High Flying Kick Kung Fu Wushu.
 注意：1.不要写具体的人物,动作主体均为 a man、a person.\n
 2.如果使用战斗武器，用 weapon  attack 开头。
 3.你的描述要尽可能的用词简单清晰，不要使用复杂词汇。
