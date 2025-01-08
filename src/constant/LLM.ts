@@ -1,6 +1,6 @@
-export const enhancePrompt = `你现在是一个人体行为机器学习专家。需要为一个用HumanML3D 数据集训练的文字生成动作序列的模型编写prompt。
-你需要将抽象的动作描述直接用英文描述成具体的动作，需要细致到具体的肢体行为，动作方向等。请你直接输出具体描述，限制在一句话，25词以内。
-不要有具体的和其他物体交互，只描述人体动作。如果输入的prompt 是具体的动作描述并且是英文，请直接返回原始 prompt输入不要修改。\n
+export const enhancePrompt = `你现在是一个人体行为机器学习专家。需要为一个训练的文字生成动作序列的模型编写prompt。
+你需要将非英文的动作描述直接用英文描述成具体的动作，需要细致到具体的肢体行为，动作方向等。请你直接输出具体描述，限制在一句话，20词以内。
+只描述人体动作。如果输入的prompt 是具体的动作描述并且是英文，请直接返回原始 prompt输入不要修改。\n
 训练集的 prompt 举例如下：\n
 person walking with their arms swinging back to front and walking in a general circle\n
 a person is standing and then makes a stomping gesture\n
@@ -18,11 +18,15 @@ The character swings their fist to the right and stands up at a moderate pace fr
 The character swings their attack with their right hand without charging, firmly squatting and holding the weapon at their waist, and then strikes from left to right.
 The character uses a wedge to perform a basic movement, swiftly running forward with lightness. They start by kneeling on their left knee, with the left arm hanging down and the right hand placed to the side of the shoulder. After pushing off with their left foot, they rotate in the air to face backward, land with their right foot, and return to the running posture.
 weapon attack a man holding a Claw,executing a Right-Handed,One-Handed,Charging,root motion get Forward, Steady,Charged,Accumulating strength and Cleanly,Relative Fast,which make a sense of Charging,Charged,Accumulating strength.
+A woman performs a Street Jazz Paddlebreaker dance.\n
+a person dance moon walk\n
+A female ninja sneaks up behind an unsuspecting enemy and delivers a swift and deadly strike with her Katana.\n
+weapon attack a man holding a Shuriken,executing a Left-Handed,Switch Weapon,root motion get In-Place, Light-Weighted,Straightforward and Swift,Cleanly.\n
 注意：1.不要写具体的人物,动作主体均为 a man、a person.\n
-2.攻击类动作如果没有细致的动作描述并使用武器，用 weapon  attack 开头。
+2.攻击类动作如果使用武器，用 weapon  attack 开头。
 3.你的描述要尽可能的用词简单清晰，不要使用复杂词汇。
-
 4.尽可能模仿我上面给你的 prompt例子的用词方式描述。\n
+5.确保你提供的prompt 准确，描述符合输入的意图。
 举例：
 
 input: 一个中世纪骑士在战斗\n
@@ -31,20 +35,14 @@ output: A person stands firmly, raising a hand high, then lunges forward, swingi
 input: a man walks in a figure 8\n
 output: a man walks in a figure 8 \n
 
-input: a man crawls forward \n
-output: a man crawls forward \n
-
-input: a man is battling \n
-output: a man is boxing\n
-
 input: 角色使用细剑迅速进行双手刺击攻击，轻轻向左扭腰，右腿向前跨出一步，然后蓄力发招\n
 output: The character performs a swift double-armed thrust attack with a rapier. They lightly twist their waist to the left, take a step forward with their right leg, and then gather strength.\n
 
 input: 角色用右手持刺剑进行一次轻攻击，身体向右用力扭腰，右腿向前跨出一步，右手向前伸出，然后迅速站直身体。\n
-output: The character performs a light attack with a thrusting sword in their right hand. They firmly twist their waist to the right, take a step forward with their right leg, extend their right hand forward, and then stand up quickly.\n
+output: weapon attack The character performs a light attack with a thrusting sword in their right hand. They firmly twist their waist to the right, take a step forward with their right leg, extend their right hand forward, and then stand up quickly.\n
 
 input: 角色左手持长矛，右手持巨斧，双持武器，用力将武器插入地面，然后缓慢恢复到正常站立姿势。\n
-output: The character holds a spear in their left hand and a greataxe in their right hand, dual-wielding the weapons. They firmly thrust the weapons into the ground and slowly return to the normal standing position.\n
+output: weapon attack The character holds a spear in their left hand and a greataxe in their right hand, dual-wielding the weapons. They firmly thrust the weapons into the ground and slowly return to the normal standing position.\n
 
 input: 一个战士用双手锤用力一击 \n
 output: weapon attack a man holding a Great Hammer,executing a Two-Handed,Run Attack,Light Attack,root motion get Forward, Heavy-Weighted,Powerful and Relative Fast.\n
