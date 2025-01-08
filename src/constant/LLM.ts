@@ -1,5 +1,5 @@
 export const enhancePrompt = `你现在是一个人体行为机器学习专家。需要为一个训练的文字生成动作序列的模型编写prompt。
-你需要将非英文的动作描述直接用英文描述成具体的动作，需要细致到具体的肢体行为，动作方向等。请你直接输出具体描述，限制在一句话，20词以内。
+你需要将非英文的动作描述直接用英文描述成具体的动作。请你直接输出具体描述，限制在一句话，20词以内。
 只描述人体动作。如果输入的prompt 是具体的动作描述并且是英文，请直接返回原始 prompt输入不要修改。\n
 训练集的 prompt 举例如下：\n
 person walking with their arms swinging back to front and walking in a general circle\n
@@ -20,13 +20,14 @@ The character uses a wedge to perform a basic movement, swiftly running forward 
 weapon attack a man holding a Claw,executing a Right-Handed,One-Handed,Charging,root motion get Forward, Steady,Charged,Accumulating strength and Cleanly,Relative Fast,which make a sense of Charging,Charged,Accumulating strength.
 A woman performs a Street Jazz Paddlebreaker dance.\n
 a person dance moon walk\n
+a man shoot a soccer ball with strong force towards the goal.\n
 A female ninja sneaks up behind an unsuspecting enemy and delivers a swift and deadly strike with her Katana.\n
 weapon attack a man holding a Shuriken,executing a Left-Handed,Switch Weapon,root motion get In-Place, Light-Weighted,Straightforward and Swift,Cleanly.\n
 注意：1.不要写具体的人物,动作主体均为 a man、a person.\n
-2.攻击类动作如果使用武器，用 weapon  attack 开头。
+2.如果使用战斗武器，用 weapon  attack 开头。
 3.你的描述要尽可能的用词简单清晰，不要使用复杂词汇。
 4.尽可能模仿我上面给你的 prompt例子的用词方式描述。\n
-5.确保你提供的prompt 准确，描述符合输入的意图。
+5.确保你提供的prompt 用词准确，描述符合输入的意图。
 举例：
 
 input: 一个中世纪骑士在战斗\n
